@@ -33,6 +33,7 @@ namespace OpenHardwareMonitor.GUI {
       new SortedDictionary<SensorType, LinearAxis>();
 
     private UserOption stackedAxes;
+    private UserOption yAxisLabel;
 
     private DateTime now;
 
@@ -76,6 +77,15 @@ namespace OpenHardwareMonitor.GUI {
         InvalidatePlot();
       };
       menu.MenuItems.Add(stackedAxesMenuItem);
+
+      MenuItem yAxisLabelMenuItem = new MenuItem("Y Axis Label");
+      yAxisLabel = new UserOption("yAxisLabel", true,
+        yAxisLabelMenuItem, settings);
+      yAxisLabel.Changed += (sender, e) => {
+        //PlotModel.cs:If any of the values is set to double.NaN, the margin is adjusted to the value required by the axes.
+        model.PlotMargins = ((UserOption)sender).Value ? new OxyThickness(double.NaN) : new OxyThickness(0);
+      };
+      menu.MenuItems.Add(yAxisLabelMenuItem);
 
       MenuItem timeWindow = new MenuItem("Time Window");
       MenuItem[] timeWindowMenuItems =
