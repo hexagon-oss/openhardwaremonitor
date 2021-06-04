@@ -22,7 +22,7 @@ namespace OpenHardwareMonitor {
     public static StartupParams Arguments;
     [STAThread]
     public static void Main(string[] args) {
-#if !DEBUG
+      #if !DEBUG
         Application.ThreadException += 
           new ThreadExceptionEventHandler(Application_ThreadException);
         Application.SetUnhandledExceptionMode(
@@ -30,7 +30,7 @@ namespace OpenHardwareMonitor {
 
         AppDomain.CurrentDomain.UnhandledException += 
           new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
-#endif
+      #endif
 
       if (!AllRequiredFilesAvailable() || !IsNetFramework45Installed())
         Environment.Exit(0);
@@ -39,9 +39,9 @@ namespace OpenHardwareMonitor {
       Application.EnableVisualStyles();
       Application.SetCompatibleTextRenderingDefault(false);
       using (GUI.MainForm form = new GUI.MainForm()) {
-        form.FormClosed += delegate (Object sender, FormClosedEventArgs e) {
+        form.FormClosed += delegate(Object sender, FormClosedEventArgs e) {
           Application.Exit();
-        };
+        };        
         Application.Run();
       }
     }
@@ -51,12 +51,12 @@ namespace OpenHardwareMonitor {
         Path.DirectorySeparatorChar;
 
       if (!File.Exists(path + fileName)) {
-        MessageBox.Show("The following file could not be found: " + fileName +
+        MessageBox.Show("The following file could not be found: " + fileName + 
           "\nPlease extract all files from the archive.", "Error",
            MessageBoxButtons.OK, MessageBoxIcon.Error);
         return false;
       }
-      return true;
+      return true;      
     }
 
     private static bool AllRequiredFilesAvailable() {
@@ -68,12 +68,12 @@ namespace OpenHardwareMonitor {
         return false;
       if (!IsFileAvailable("OxyPlot.WindowsForms.dll"))
         return false;
-
+      
       return true;
     }
 
     private static bool IsNetFramework45Installed() {
-      Type type;
+      Type type;      
       try {
         type = TryGetDefaultDllImportSearchPathsAttributeType();
       } catch (TypeLoadException) {
@@ -98,8 +98,9 @@ namespace OpenHardwareMonitor {
       form.ShowDialog();
     }
 
-    public static void Application_ThreadException(object sender,
-      ThreadExceptionEventArgs e) {
+    public static void Application_ThreadException(object sender, 
+      ThreadExceptionEventArgs e) 
+    {
       try {
         ReportException(e.Exception);
       } catch {
@@ -108,8 +109,9 @@ namespace OpenHardwareMonitor {
       }
     }
 
-    public static void CurrentDomain_UnhandledException(object sender,
-      UnhandledExceptionEventArgs args) {
+    public static void CurrentDomain_UnhandledException(object sender, 
+      UnhandledExceptionEventArgs args) 
+    {
       try {
         Exception e = args.ExceptionObject as Exception;
         if (e != null)
@@ -118,6 +120,6 @@ namespace OpenHardwareMonitor {
       } finally {
         Environment.Exit(0);
       }
-    }
+    }   
   }
 }
