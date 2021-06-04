@@ -3,29 +3,28 @@ using System.Collections.Generic;
 
 namespace OpenHardwareMonitor.Utilities {
   public class StartupParams {
-    private List<Types> Parameters;
+    private List<Types> Items;
 
     public StartupParams(string[] args) {
-      Parameters = new List<Types>();
+      Items = new List<Types>();
 
       for (int i = 0; i < args.Length; i++) {
-        Types type;
-
         if (!args[i].StartsWith("--"))
           continue;
 
+        Types type;
+
         if (Enum.TryParse(args[i].ToUpper().TrimStart('-'), out type)) {
-          Parameters.Add(type);
+          Items.Add(type);
         }
       }//for
     }
 
     public bool Contains(Types type) {
-      return Parameters.Contains(type);
+      return Items.Contains(type);
     }
 
     public enum Types {
-      UNKNOWN,
       STARTMINIMIZED
     }
   }
