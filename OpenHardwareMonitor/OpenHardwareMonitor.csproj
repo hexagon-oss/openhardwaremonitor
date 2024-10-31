@@ -87,8 +87,8 @@
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="Grapevine" Version="5.0.0-rc.10" />
-    <PackageReference Include="NLog" Version="4.7.15" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="1.7.5" />
+    <PackageReference Include="NLog" Version="5.3.4" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.14" />
     <PackageReference Include="OxyPlot.WindowsForms" Version="2.0.0" />
   </ItemGroup>
   <ItemGroup>
