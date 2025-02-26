@@ -3,7 +3,7 @@
 
 #ifndef RootDir
 #define RootDir ".."
-#define IsDebug "true"
+#define IsDebug "false"
 #endif
 
 #define MyAppName "OpenHardwareMonitor"
