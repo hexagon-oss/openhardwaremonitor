@@ -740,7 +740,7 @@ namespace OpenHardwareMonitor.GUI {
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(488, 639);
             this.Controls.Add(this.splitContainer);
             this.Controls.Add(this.mainMenu);
