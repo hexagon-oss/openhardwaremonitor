@@ -19,6 +19,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Aga.Controls.Tree;
 using Aga.Controls.Tree.NodeControls;
@@ -801,9 +802,13 @@ namespace OpenHardwareMonitor.GUI
 
         private int delayCount = 0;
 
-        private void timer_Tick(object sender, EventArgs e)
+        private async void timer_Tick(object sender, EventArgs e)
         {
-            computer.Accept(updateVisitor);
+
+            //computer.Accept(updateVisitor); //720ms gui freeze 
+            await Task.Run(() => {
+                computer.Accept(updateVisitor);
+            });  
             treeView.Invalidate();
             plotPanel.InvalidatePlot();
             systemTray.Redraw();
