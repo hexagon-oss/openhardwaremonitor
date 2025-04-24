@@ -30,6 +30,8 @@ namespace OpenHardwareMonitor
         [STAThread]
         public static int Main(string[] args)
         {
+            WinformsDpiHelper.SetProcess_DPIAware();
+
             if (!AllRequiredFilesAvailable())
                 return 1;
 
