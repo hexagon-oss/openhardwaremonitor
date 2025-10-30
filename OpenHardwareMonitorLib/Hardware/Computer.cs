@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Permissions;
 using System.Reflection;
+using OpenHardwareMonitor.Hardware.Motherboard;
 
 namespace OpenHardwareMonitor.Hardware;
 
@@ -110,7 +111,7 @@ public class Computer : IComputer
     private void AddGroups()
     {
         if (mainboardEnabled)
-            Add(new Mainboard.MainboardGroup(smbios, settings));
+            Add(new MotherboardGroup(smbios, settings));
 
         if (cpuEnabled)
             Add(new Cpu.CpuGroup(settings));
@@ -157,9 +158,9 @@ public class Computer : IComputer
             if (open && value != mainboardEnabled)
             {
                 if (value)
-                    Add(new Mainboard.MainboardGroup(smbios, settings));
+                    Add(new MotherboardGroup(smbios, settings));
                 else
-                    RemoveType<Mainboard.MainboardGroup>();
+                    RemoveType<MotherboardGroup>();
             }
             mainboardEnabled = value;
         }

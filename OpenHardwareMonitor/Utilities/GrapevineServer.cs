@@ -346,13 +346,13 @@ namespace OpenHardwareMonitor.Utilities
                     return "cpu.png";
                 case HardwareType.GpuNvidia:
                     return "nvidia.png";
-                case HardwareType.GpuAti:
-                    return "ati.png";
+                case HardwareType.GpuAmd:
+                    return "amd.png";
                 case HardwareType.HDD:
                     return "hdd.png";
                 case HardwareType.Heatmaster:
                     return "bigng.png";
-                case HardwareType.Mainboard:
+                case HardwareType.Motherboard:
                     return "mainboard.png";
                 case HardwareType.SuperIO:
                     return "chip.png";

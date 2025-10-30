@@ -13,20 +13,6 @@ using System;
 namespace OpenHardwareMonitor.Hardware;
 
 public delegate void SensorEventHandler(ISensor sensor);
-  
-public enum HardwareType
-{
-    Mainboard,
-    SuperIO,
-    Cpu,
-    RAM,
-    GpuNvidia,
-    GpuAti,    
-    TBalancer,
-    Heatmaster,
-    HDD,
-    Network
-}
 
 public interface IHardware : IElement, IDisposable {
 

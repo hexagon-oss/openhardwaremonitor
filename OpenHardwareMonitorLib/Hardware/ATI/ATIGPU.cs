@@ -180,7 +180,7 @@ namespace OpenHardwareMonitor.Hardware.ATI
 
         public override HardwareType HardwareType
         {
-            get { return HardwareType.GpuAti; }
+            get { return HardwareType.GpuAmd; }
         }
 
         private void GetODNTemperature(ADLODNTemperatureType type,

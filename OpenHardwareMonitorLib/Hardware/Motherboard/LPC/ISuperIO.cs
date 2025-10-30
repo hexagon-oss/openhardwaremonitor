@@ -1,33 +1,35 @@
-﻿/*
- 
-  This Source Code Form is subject to the terms of the Mozilla Public
-  License, v. 2.0. If a copy of the MPL was not distributed with this
-  file, You can obtain one at http://mozilla.org/MPL/2.0/.
- 
-  Copyright (C) 2009-2011 Michael Möller <mmoeller@openhardwaremonitor.org>
-	
-*/
+﻿// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// Copyright (C) LibreHardwareMonitor and Contributors.
+// Partial Copyright (C) Michael Möller <mmoeller@openhardwaremonitor.org> and Contributors.
+// All Rights Reserved.
 
-namespace OpenHardwareMonitor.Hardware.Motherboard.LPC {
-  internal interface ISuperIO {
+namespace OpenHardwareMonitor.Hardware.Motherboard.Lpc;
 
+internal interface ISuperIO
+{
     Chip Chip { get; }
 
-    // get voltage, temperature, fan and control channel values
-    double?[] Voltages { get; }
-    double?[] Temperatures { get; }
-    double?[] Fans { get; }
-    double?[] Controls { get; }
+    float?[] Controls { get; }
 
-    // set control value, null = auto    
-    void SetControl(int index, byte? value);         
+    float?[] Fans { get; }
+
+    float?[] Temperatures { get; }
+
+    // get voltage, temperature, fan and control channel values
+    float?[] Voltages { get; }
+
+    // set control value, null = auto
+    void SetControl(int index, byte? value);
 
     // read and write GPIO
-    byte? ReadGPIO(int index);
-    void WriteGPIO(int index, byte value);
+    byte? ReadGpio(int index);
+
+    void WriteGpio(int index, byte value);
 
     string GetReport();
 
     void Update();
-  }
+
+    void Close();
 }

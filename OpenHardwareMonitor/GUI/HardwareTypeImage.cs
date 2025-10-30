@@ -38,8 +38,8 @@ namespace OpenHardwareMonitor.GUI {
           case HardwareType.GpuNvidia:
             image = Utilities.EmbeddedResources.GetImage("nvidia.png");
             break;
-          case HardwareType.GpuAti:
-            image = Utilities.EmbeddedResources.GetImage("ati.png");
+          case HardwareType.GpuAmd:
+            image = Utilities.EmbeddedResources.GetImage("amd.png");
             break;
           case HardwareType.HDD:
             image = Utilities.EmbeddedResources.GetImage("hdd.png");
@@ -47,7 +47,7 @@ namespace OpenHardwareMonitor.GUI {
           case HardwareType.Heatmaster:
             image = Utilities.EmbeddedResources.GetImage("bigng.png");
             break;
-          case HardwareType.Mainboard:
+          case HardwareType.Motherboard:
             image = Utilities.EmbeddedResources.GetImage("mainboard.png");
             break;
           case HardwareType.SuperIO:
