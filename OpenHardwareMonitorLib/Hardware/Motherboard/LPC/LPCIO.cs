@@ -8,13 +8,14 @@
 	
 */
 
+using OpenHardwareMonitor.Hardware.LPC;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Threading;
 
-namespace OpenHardwareMonitor.Hardware.LPC {
+namespace OpenHardwareMonitor.Hardware.Motherboard.LPC {
   internal class LPCIO {
 
     private readonly List<ISuperIO> superIOs = new List<ISuperIO>();
@@ -266,7 +267,7 @@ namespace OpenHardwareMonitor.Hardware.LPC {
           port.WinbondNuvotonFintekExit();
 
           ReportUnknownChip(port, "Winbond / Nuvoton / Fintek", 
-            ((id << 8) | revision));
+            id << 8 | revision);
         }
       } else {
 

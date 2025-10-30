@@ -99,7 +99,7 @@ public class Computer : IComputer
 
         this.smbios = new SMBIOS();
 
-        Ring0.Open();
+        Mutexes.Open();
         Opcode.Open();
 
         AddGroups();
@@ -393,14 +393,6 @@ public class Computer : IComputer
             w.WriteLine(IntPtr.Size == 4 ? "32-Bit" : "64-Bit");
             w.WriteLine();
 
-            string r = Ring0.GetReport();
-            if (r != null)
-            {
-                NewSection(w);
-                w.Write(r);
-                w.WriteLine();
-            }
-
             NewSection(w);
             w.WriteLine("Sensors");
             w.WriteLine();
@@ -447,7 +439,7 @@ public class Computer : IComputer
         RemoveGroups();
 
         Opcode.Close();
-        Ring0.Close();
+        Mutexes.Close();
 
         this.smbios = null;
 

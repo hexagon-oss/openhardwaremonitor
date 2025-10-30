@@ -13,7 +13,7 @@ using System;
 using System.Globalization;
 using System.Text;
 
-namespace OpenHardwareMonitor.Hardware.LPC {
+namespace OpenHardwareMonitor.Hardware.Motherboard.LPC {
   internal class NCT677X : ISuperIO {
 
     private readonly ushort port;
@@ -195,7 +195,7 @@ namespace OpenHardwareMonitor.Hardware.LPC {
       this.port = port;
       this.lpcPort = lpcPort;
 
-      if (chip == LPC.Chip.NCT610X) {
+      if (chip == Chip.NCT610X) {
         VENDOR_ID_HIGH_REGISTER = 0x80FE;
         VENDOR_ID_LOW_REGISTER = 0x00FE;  
 
@@ -218,7 +218,7 @@ namespace OpenHardwareMonitor.Hardware.LPC {
         vBatMonitorControlRegister = 0x005D;
       }
 
-      this.isNuvotonVendor = IsNuvotonVendor();
+      isNuvotonVendor = IsNuvotonVendor();
 
       if (!isNuvotonVendor)
         return;
@@ -386,7 +386,7 @@ namespace OpenHardwareMonitor.Hardware.LPC {
     }
 
     private bool IsNuvotonVendor() {
-      return ((ReadByte(VENDOR_ID_HIGH_REGISTER) << 8) |
+      return (ReadByte(VENDOR_ID_HIGH_REGISTER) << 8 |
         ReadByte(VENDOR_ID_LOW_REGISTER)) == NUVOTON_VENDOR_ID;
     }
 
@@ -482,15 +482,15 @@ namespace OpenHardwareMonitor.Hardware.LPC {
         if (valid && voltageRegisters[i] == voltageVBatRegister) 
           valid = (ReadByte(vBatMonitorControlRegister) & 0x01) > 0;
 
-        voltages[i] = valid ? value : (double?)null;
+        voltages[i] = valid ? value : null;
       }
 
       int temperatureSourceMask = 0;
       for (int i = temperatureRegister.Length - 1; i >= 0 ; i--) {
-        int value = ((sbyte)ReadByte(temperatureRegister[i])) << 1;
+        int value = (sbyte)ReadByte(temperatureRegister[i]) << 1;
         if (temperatureHalfBit[i] > 0) {
-          value |= ((ReadByte(temperatureHalfRegister[i]) >>
-            temperatureHalfBit[i]) & 0x1);
+          value |= ReadByte(temperatureHalfRegister[i]) >>
+            temperatureHalfBit[i] & 0x1;
         }
 
         byte source = ReadByte(temperatureSourceRegister[i]);
@@ -508,7 +508,7 @@ namespace OpenHardwareMonitor.Hardware.LPC {
         if (!alternateTemperatureRegister[i].HasValue)
           continue;
 
-        if ((temperatureSourceMask & (1 << temperaturesSource[i])) > 0)
+        if ((temperatureSourceMask & 1 << temperaturesSource[i]) > 0)
           continue;
 
         double? temperature = (sbyte)
@@ -524,7 +524,7 @@ namespace OpenHardwareMonitor.Hardware.LPC {
         if (fanCountRegister != null) {
           byte high = ReadByte(fanCountRegister[i]);
           byte low = ReadByte((ushort)(fanCountRegister[i] + 1));
-          int count = (high << 5) | (low & 0x1F); 
+          int count = high << 5 | low & 0x1F; 
           if (count < maxFanCount) {            
             if (count >= minFanCount) {
               fans[i] = 1.35e6f / count;
@@ -537,7 +537,7 @@ namespace OpenHardwareMonitor.Hardware.LPC {
         } else {
           byte high = ReadByte(fanRpmBaseRegister[i]);
           byte low = ReadByte((ushort)(fanRpmBaseRegister[i] + 1));
-          int value = (high << 8) | low;
+          int value = high << 8 | low;
 
           fans[i] = value > minFanRPM ? value : 0;
         }
@@ -554,7 +554,7 @@ namespace OpenHardwareMonitor.Hardware.LPC {
     public string GetReport() {
       StringBuilder r = new StringBuilder();
 
-      r.AppendLine("LPC " + this.GetType().Name);
+      r.AppendLine("LPC " + GetType().Name);
       r.AppendLine();
       r.Append("Chip ID: 0x"); r.AppendLine(chip.ToString("X"));
       r.Append("Chip revision: 0x");

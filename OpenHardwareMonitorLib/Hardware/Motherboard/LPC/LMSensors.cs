@@ -13,7 +13,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 
-namespace OpenHardwareMonitor.Hardware.LPC {
+namespace OpenHardwareMonitor.Hardware.Motherboard.LPC {
 
   internal class LMSensors {
 
@@ -141,27 +141,27 @@ namespace OpenHardwareMonitor.Hardware.LPC {
         this.chip = chip;
 
         string[] voltagePaths = Directory.GetFiles(path, "in*_input");
-        this.voltages = new double?[voltagePaths.Length];
-        this.voltageStreams = new FileStream[voltagePaths.Length];
+        voltages = new double?[voltagePaths.Length];
+        voltageStreams = new FileStream[voltagePaths.Length];
         for (int i = 0; i < voltagePaths.Length; i++)
           voltageStreams[i] = new FileStream(voltagePaths[i],
             FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
         string[] temperaturePaths = Directory.GetFiles(path, "temp*_input");
-        this.temperatures = new double?[temperaturePaths.Length];
-        this.temperatureStreams = new FileStream[temperaturePaths.Length];
+        temperatures = new double?[temperaturePaths.Length];
+        temperatureStreams = new FileStream[temperaturePaths.Length];
         for (int i = 0; i < temperaturePaths.Length; i++)
           temperatureStreams[i] = new FileStream(temperaturePaths[i],
             FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
         string[] fanPaths = Directory.GetFiles(path, "fan*_input");
-        this.fans = new double?[fanPaths.Length];
-        this.fanStreams = new FileStream[fanPaths.Length];
+        fans = new double?[fanPaths.Length];
+        fanStreams = new FileStream[fanPaths.Length];
         for (int i = 0; i < fanPaths.Length; i++)
           fanStreams[i] = new FileStream(fanPaths[i],
             FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
-        this.controls = new double?[0];
+        controls = new double?[0];
       }
 
       public byte? ReadGPIO(int index) {

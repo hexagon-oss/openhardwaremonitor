@@ -12,7 +12,7 @@ using System;
 using System.Globalization;
 using System.Text;
 
-namespace OpenHardwareMonitor.Hardware.LPC {
+namespace OpenHardwareMonitor.Hardware.Motherboard.LPC {
   internal class F718XX : ISuperIO {
 
     private readonly ushort address;
@@ -110,7 +110,7 @@ namespace OpenHardwareMonitor.Hardware.LPC {
     public string GetReport() {
       StringBuilder r = new StringBuilder();
 
-      r.AppendLine("LPC " + this.GetType().Name);
+      r.AppendLine("LPC " + GetType().Name);
       r.AppendLine();
       r.Append("Base Adress: 0x"); 
       r.AppendLine(address.ToString("X4", CultureInfo.InvariantCulture));
@@ -129,7 +129,7 @@ namespace OpenHardwareMonitor.Hardware.LPC {
         r.Append("  ");
         for (int j = 0; j <= 0xF; j++) {
           r.Append(" ");
-          r.Append(ReadByte((byte)((i << 4) | j)).ToString("X2", 
+          r.Append(ReadByte((byte)(i << 4 | j)).ToString("X2", 
             CultureInfo.InvariantCulture));
         }
         r.AppendLine();
@@ -195,7 +195,7 @@ namespace OpenHardwareMonitor.Hardware.LPC {
         value |= ReadByte((byte)(FAN_TACHOMETER_REG[i] + 1));
 
         if (value > 0) 
-          fans[i] = (value < 0x0fff) ? 1.5e6 / value : 0;
+          fans[i] = value < 0x0fff ? 1.5e6 / value : 0;
         else 
           fans[i] = null;        
       }

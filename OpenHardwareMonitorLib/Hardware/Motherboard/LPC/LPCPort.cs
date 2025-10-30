@@ -8,7 +8,7 @@
 	
 */
 
-namespace OpenHardwareMonitor.Hardware.LPC {
+namespace OpenHardwareMonitor.Hardware.Motherboard.LPC {
 
   internal class LPCPort {
     private readonly ushort registerPort;
@@ -45,7 +45,7 @@ namespace OpenHardwareMonitor.Hardware.LPC {
     }
 
     public ushort ReadWord(byte register) {
-      return (ushort)((ReadByte(register) << 8) |
+      return (ushort)(ReadByte(register) << 8 |
         ReadByte((byte)(register + 1)));
     }
 

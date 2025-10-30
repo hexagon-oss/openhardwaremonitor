@@ -12,7 +12,7 @@ using System.Globalization;
 using System.Text;
 using System;
 
-namespace OpenHardwareMonitor.Hardware.LPC {
+namespace OpenHardwareMonitor.Hardware.Motherboard.LPC {
   internal class IT87XX : ISuperIO {
        
     private readonly ushort address;
@@ -63,7 +63,7 @@ namespace OpenHardwareMonitor.Hardware.LPC {
     private byte ReadByte(byte register, out bool valid) {
       Ring0.WriteIoPort(addressReg, register);
       byte value = Ring0.ReadIoPort(dataReg);
-      if (this.chip == Chip.IT8688E)
+      if (chip == Chip.IT8688E)
         valid = true;
       else
         valid = register == Ring0.ReadIoPort(addressReg);
@@ -96,7 +96,7 @@ namespace OpenHardwareMonitor.Hardware.LPC {
 
         if (index < 3) {
           initialFanOutputModeEnabled[index] = 
-            (ReadByte(FAN_MAIN_CTRL_REG, out _) & (1 << index)) > 0;
+            (ReadByte(FAN_MAIN_CTRL_REG, out _) & 1 << index) > 0;
         }
 
         if (chip == Chip.IT8721F || 
@@ -119,8 +119,8 @@ namespace OpenHardwareMonitor.Hardware.LPC {
         if (index < 3) {
           var value = ReadByte(FAN_MAIN_CTRL_REG, out _);
 
-          if ((value & (1 << index)) > 0 != initialFanOutputModeEnabled[index]) {
-            WriteByte(FAN_MAIN_CTRL_REG, (byte)(value ^ (1 << index)));
+          if ((value & 1 << index) > 0 != initialFanOutputModeEnabled[index]) {
+            WriteByte(FAN_MAIN_CTRL_REG, (byte)(value ^ 1 << index));
           }
         }
 
@@ -149,7 +149,7 @@ namespace OpenHardwareMonitor.Hardware.LPC {
         if (index < 3) {
           if (!initialFanOutputModeEnabled[index]) {
             WriteByte(FAN_MAIN_CTRL_REG,
-              (byte)(ReadByte(FAN_MAIN_CTRL_REG, out _) | (1 << index)));
+              (byte)(ReadByte(FAN_MAIN_CTRL_REG, out _) | 1 << index));
           }
         }
 
@@ -177,8 +177,8 @@ namespace OpenHardwareMonitor.Hardware.LPC {
       this.address = address;
       this.chip = chip;
       this.version = version;
-      this.addressReg = (ushort)(address + ADDRESS_REGISTER_OFFSET);
-      this.dataReg = (ushort)(address + DATA_REGISTER_OFFSET);
+      addressReg = (ushort)(address + ADDRESS_REGISTER_OFFSET);
+      dataReg = (ushort)(address + DATA_REGISTER_OFFSET);
       this.gpioAddress = gpioAddress;
 
       // Check vendor id
@@ -258,8 +258,8 @@ namespace OpenHardwareMonitor.Hardware.LPC {
       }
 
       // older IT8705F and IT8721F revisions do not have 16-bit fan counters
-      if ((chip == Chip.IT8705F && version < 3) || 
-          (chip == Chip.IT8712F && version < 8)) 
+      if (chip == Chip.IT8705F && version < 3 || 
+          chip == Chip.IT8712F && version < 8) 
       {
         has16bitFanCounter = false;
       } else {
@@ -293,7 +293,7 @@ namespace OpenHardwareMonitor.Hardware.LPC {
     public string GetReport() {
       StringBuilder r = new StringBuilder();
 
-      r.AppendLine("LPC " + this.GetType().Name);
+      r.AppendLine("LPC " + GetType().Name);
       r.AppendLine();
       r.Append("Chip ID: 0x"); r.AppendLine(chip.ToString("X"));
       r.Append("Chip Version: 0x"); r.AppendLine(
@@ -318,7 +318,7 @@ namespace OpenHardwareMonitor.Hardware.LPC {
         for (int j = 0; j <= 0xF; j++) {
           r.Append(" ");
           bool valid;
-          byte value = ReadByte((byte)((i << 4) | j), out valid);
+          byte value = ReadByte((byte)(i << 4 | j), out valid);
           r.Append(
             valid ? value.ToString("X2", CultureInfo.InvariantCulture) : "??");
         }
@@ -383,7 +383,7 @@ namespace OpenHardwareMonitor.Hardware.LPC {
             continue;
 
           if (value > 0x3f) {
-            fans[i] = (value < 0xffff) ? 1.35e6f / (value * 2) : 0;
+            fans[i] = value < 0xffff ? 1.35e6f / (value * 2) : 0;
           } else {
             fans[i] = null;
           }
@@ -400,11 +400,11 @@ namespace OpenHardwareMonitor.Hardware.LPC {
             int divisors = ReadByte(FAN_TACHOMETER_DIVISOR_REGISTER, out valid);
             if (!valid)
               continue;
-            divisor = 1 << ((divisors >> (3 * i)) & 0x7);
+            divisor = 1 << (divisors >> 3 * i & 0x7);
           }
 
           if (value > 0) {
-            fans[i] = (value < 0xff) ? 1.35e6f / (value * divisor) : 0;
+            fans[i] = value < 0xff ? 1.35e6f / (value * divisor) : 0;
           } else {
             fans[i] = null;
           }
