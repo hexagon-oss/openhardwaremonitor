@@ -13,109 +13,124 @@ using Microsoft.Extensions.Logging;
 using OpenHardwareMonitor.Collections;
 using OpenHardwareMonitorLib;
 
-namespace OpenHardwareMonitor.Hardware {
-  internal abstract class Hardware : IHardware, IDisposable {
+namespace OpenHardwareMonitor.Hardware;
 
-    private readonly Identifier identifier;
-    protected readonly string name;
-    private string customName;
-    protected readonly ISettings settings;
-    protected readonly ListSet<ISensor> active = new ListSet<ISensor>();
+public abstract class Hardware : IHardware, IDisposable
+{
+    private readonly Identifier _identifier;
+    protected readonly string _name;
+    private string _customName;
+    protected readonly ISettings _settings;
+    protected readonly ListSet<ISensor> _active = new ListSet<ISensor>();
 
-    public Hardware(string name, Identifier identifier, ISettings settings) {
-      this.settings = settings;
-      this.identifier = identifier;
-      this.name = name;
-      Logger = this.GetCurrentClassLogger();
-      this.customName = settings.GetValue(
-        new Identifier(Identifier, "name").ToString(), name);
+    public Hardware(string name, Identifier identifier, ISettings settings)
+    {
+        _settings = settings;
+        _identifier = identifier;
+        _name = name;
+        Logger = this.GetCurrentClassLogger();
+        _customName = settings.GetValue(
+            new Identifier(Identifier, "name").ToString(), name);
     }
 
-    public IHardware[] SubHardware {
-      get { return new IHardware[0]; }
+    public IHardware[] SubHardware
+    {
+        get { return new IHardware[0]; }
     }
 
-    public virtual IHardware Parent {
-      get { return null; }
+    public virtual IHardware Parent
+    {
+        get { return null; }
     }
 
-    public virtual ISensor[] Sensors {
-      get { return active.ToArray(); }
+    public virtual ISensor[] Sensors
+    {
+        get { return _active.ToArray(); }
     }
 
-    protected ILogger Logger {
-      get;
+    protected ILogger Logger
+    {
+        get;
     }
 
-    protected virtual void ActivateSensor(ISensor sensor) {
-      if (active.Add(sensor)) 
-        if (SensorAdded != null)
-          SensorAdded(sensor);
+    protected virtual void ActivateSensor(ISensor sensor)
+    {
+        if (_active.Add(sensor))
+            if (SensorAdded != null)
+                SensorAdded(sensor);
     }
 
-    protected virtual void DeactivateSensor(ISensor sensor) {
-      if (active.Remove(sensor))
-        if (SensorRemoved != null)
-          SensorRemoved(sensor);     
+    protected virtual void DeactivateSensor(ISensor sensor)
+    {
+        if (_active.Remove(sensor))
+            if (SensorRemoved != null)
+                SensorRemoved(sensor);
     }
 
-    public string Name {
-      get {
-        return customName;
-      }
-      set {
-        if (!string.IsNullOrEmpty(value))
-          customName = value;
-        else
-          customName = name;
-        settings.SetValue(new Identifier(Identifier, "name").ToString(), 
-          customName);
-      }
+    public string Name
+    {
+        get
+        {
+            return _customName;
+        }
+        set
+        {
+            if (!string.IsNullOrEmpty(value))
+                _customName = value;
+            else
+                _customName = _name;
+            _settings.SetValue(new Identifier(Identifier, "name").ToString(),
+                _customName);
+        }
     }
 
-    public Identifier Identifier {
-      get {
-        return identifier;
-      }
+    public Identifier Identifier
+    {
+        get
+        {
+            return _identifier;
+        }
     }
 
-    #pragma warning disable 67
     public event SensorEventHandler SensorAdded;
     public event SensorEventHandler SensorRemoved;
-    #pragma warning restore 67
-  
-    
+
     public abstract HardwareType HardwareType { get; }
 
-    public virtual string GetReport() {
-      return null;
+    public virtual string GetReport()
+    {
+        return null;
     }
 
     public abstract void Update();
 
     public event HardwareEventHandler Closing;
 
-    public void Accept(IVisitor visitor) {
-      if (visitor == null)
-        throw new ArgumentNullException("visitor");
-      visitor.VisitHardware(this);
+    public void Accept(IVisitor visitor)
+    {
+        if (visitor == null)
+            throw new ArgumentNullException("visitor");
+        visitor.VisitHardware(this);
     }
 
-    public virtual void Traverse(IVisitor visitor) {
-      foreach (ISensor sensor in active)
-        sensor.Accept(visitor);
+    public virtual void Traverse(IVisitor visitor)
+    {
+        foreach (ISensor sensor in _active)
+            sensor.Accept(visitor);
     }
 
-    protected virtual void Dispose(bool disposing) {
-      if (disposing) {
-        if (Closing != null)
-          Closing(this);
-      }
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            if (Closing != null)
+                Closing(this);
+        }
     }
 
-    public void Dispose() {
-      Dispose(true);
-      GC.SuppressFinalize(this);
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
-  }
 }

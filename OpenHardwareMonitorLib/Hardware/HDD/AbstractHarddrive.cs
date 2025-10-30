@@ -185,7 +185,7 @@ namespace OpenHardwareMonitor.Hardware.HDD {
             Sensor sensor = new Sensor(attribute.SensorName,
               attribute.SensorChannel, attribute.DefaultHiddenSensor,
               attribute.SensorType.Value, this, attribute.ParameterDescriptions,
-              settings);
+              _settings);
 
             sensors.Add(attribute, sensor);
             ActivateSensor(sensor);

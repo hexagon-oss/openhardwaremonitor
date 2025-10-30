@@ -32,7 +32,7 @@ namespace OpenHardwareMonitor.GUI {
         return image;
       } else {
         switch (hardwareType) {
-          case HardwareType.CPU:
+          case HardwareType.Cpu:
             image = Utilities.EmbeddedResources.GetImage("cpu.png");
             break;
           case HardwareType.GpuNvidia:

@@ -91,6 +91,7 @@
     <PackageReference Include="NLog" Version="5.3.4" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.3.14" />
     <PackageReference Include="OxyPlot.WindowsForms" Version="2.0.0" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\External\treeviewadv\Aga.Controls\Aga.Controls.csproj" />

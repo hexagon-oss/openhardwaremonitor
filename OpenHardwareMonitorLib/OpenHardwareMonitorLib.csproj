@@ -6,21 +6,37 @@
     <RootNamespace>OpenHardwareMonitor</RootNamespace>
     <AssemblyName>OpenHardwareMonitorLib</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\PawnIO\LpcIO.bin" />
+    <EmbeddedResource Include="Resources\PawnIo\LpcACPIEC.bin" />
+    <EmbeddedResource Include="Resources\PawnIo\IntelMSR.bin" />
+    <EmbeddedResource Include="Resources\PawnIo\RyzenSMU.bin" />
+    <EmbeddedResource Include="Resources\PawnIo\AMDFamily0F.bin" />
+    <EmbeddedResource Include="Resources\PawnIo\AMDFamily10.bin" />
+    <EmbeddedResource Include="Resources\PawnIo\AMDFamily17.bin" />
+    <EmbeddedResource Include="Resources\PawnIO\SmbusI801.bin" />
+    <EmbeddedResource Include="Resources\PawnIO\SmbusNCT6793.bin" />
+    <EmbeddedResource Include="Resources\PawnIO\SmbusPIIX4.bin" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Properties\AssemblyVersion.cs" Link="Properties\AssemblyVersion.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Hardware\WinRing0.sys" />
-    <EmbeddedResource Include="Hardware\WinRing0x64.sys" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="RAMSPDToolkit-NDD" Version="1.3.2" />
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.235">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
     <PackageReference Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
     <PackageReference Include="System.IO.Ports" Version="8.0.0" />
-    <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="System.Management" Version="9.0.10" />
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
-    <PackageReference Include="System.Threading.AccessControl" Version="8.0.0" />
+    <PackageReference Include="System.Threading.AccessControl" Version="9.0.10" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
   </ItemGroup>
 </Project>

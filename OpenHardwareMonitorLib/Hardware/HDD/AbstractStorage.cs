@@ -111,7 +111,7 @@ namespace OpenHardwareMonitor.Hardware.HDD {
     protected virtual void CreateSensors() {
       if (driveInfos.Length > 0) {
         usageSensor =
-          new Sensor("Used Space", 0, SensorType.Load, this, settings);
+          new Sensor("Used Space", 0, SensorType.Load, this, _settings);
         ActivateSensor(usageSensor);
       }
 
@@ -140,27 +140,27 @@ namespace OpenHardwareMonitor.Hardware.HDD {
         deltaTime = throughputValues.QueryTime - lastPerformanceValues.QueryTime;
       }
 
-      Sensor s = new Sensor("Bytes read total", idx++, SensorType.Data, this, settings);
+      Sensor s = new Sensor("Bytes read total", idx++, SensorType.Data, this, _settings);
       double? v = throughputValues.BytesRead * BYTES_TO_GIGABYTES;
       newPerformanceSensors.Add((s, v));
 
-      s = new Sensor("Bytes written total", idx++, SensorType.Data, this, settings);
+      s = new Sensor("Bytes written total", idx++, SensorType.Data, this, _settings);
       v = throughputValues.BytesWritten * BYTES_TO_GIGABYTES;
       newPerformanceSensors.Add((s, v));
 
-      s = new Sensor("Read time total", idx++, SensorType.TimeSpan, this, settings);
+      s = new Sensor("Read time total", idx++, SensorType.TimeSpan, this, _settings);
       v = throughputValues.ReadTime.TotalSeconds;
       newPerformanceSensors.Add((s, v));
 
-      s = new Sensor("Write time total", idx++, SensorType.TimeSpan, this, settings);
+      s = new Sensor("Write time total", idx++, SensorType.TimeSpan, this, _settings);
       v = throughputValues.WriteTime.TotalSeconds;
       newPerformanceSensors.Add((s, v));
 
-      s = new Sensor("Idle time total", idx++, SensorType.TimeSpan, this, settings);
+      s = new Sensor("Idle time total", idx++, SensorType.TimeSpan, this, _settings);
       v = throughputValues.IdleTime.TotalSeconds;
       newPerformanceSensors.Add((s, v));
 
-      s = new Sensor("Read active time", idx++, SensorType.Load, this, settings);
+      s = new Sensor("Read active time", idx++, SensorType.Load, this, _settings);
       if (lastPerformanceValues != null) {
         TimeSpan valueDelta = throughputValues.ReadTime - lastPerformanceValues.ReadTime;
         v = valueDelta.TotalSeconds / deltaTime.TotalSeconds;
@@ -170,7 +170,7 @@ namespace OpenHardwareMonitor.Hardware.HDD {
 
       newPerformanceSensors.Add((s, v));
 
-      s = new Sensor("Write active time", idx++, SensorType.Load, this, settings);
+      s = new Sensor("Write active time", idx++, SensorType.Load, this, _settings);
       if (lastPerformanceValues != null) {
         TimeSpan valueDelta = throughputValues.WriteTime - lastPerformanceValues.WriteTime;
         v = valueDelta.TotalSeconds / deltaTime.TotalSeconds;
@@ -180,11 +180,11 @@ namespace OpenHardwareMonitor.Hardware.HDD {
 
       newPerformanceSensors.Add((s, v));
 
-      s = new Sensor("Job queue length", idx++, SensorType.RawValue, this, settings);
+      s = new Sensor("Job queue length", idx++, SensorType.RawValue, this, _settings);
       v = throughputValues.QueueDepth;
       newPerformanceSensors.Add((s, v));
 
-      s = new Sensor("Read throughput", idx++, SensorType.Throughput, this, settings);
+      s = new Sensor("Read throughput", idx++, SensorType.Throughput, this, _settings);
       if (lastPerformanceValues != null) {
         double valueDelta = throughputValues.BytesRead - lastPerformanceValues.BytesRead;
         v = (valueDelta * BYTES_TO_MEGABYTES) / deltaTime.TotalSeconds;
@@ -194,7 +194,7 @@ namespace OpenHardwareMonitor.Hardware.HDD {
 
       newPerformanceSensors.Add((s, v));
 
-      s = new Sensor("Write throughput", idx++, SensorType.Throughput, this, settings);
+      s = new Sensor("Write throughput", idx++, SensorType.Throughput, this, _settings);
       if (lastPerformanceValues != null) {
         double valueDelta = throughputValues.BytesWritten - lastPerformanceValues.BytesWritten;
         v = (valueDelta * BYTES_TO_MEGABYTES) / deltaTime.TotalSeconds;
@@ -266,7 +266,7 @@ namespace OpenHardwareMonitor.Hardware.HDD {
 
       r.AppendLine(this.GetType().Name);
       r.AppendLine();
-      r.AppendLine("Drive name: " + name);
+      r.AppendLine("Drive name: " + _name);
       r.AppendLine("Firmware version: " + firmwareRevision);
       r.AppendLine();
 

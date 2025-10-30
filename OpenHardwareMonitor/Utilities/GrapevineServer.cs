@@ -342,7 +342,7 @@ namespace OpenHardwareMonitor.Utilities
 
             switch (hn.Hardware.HardwareType)
             {
-                case HardwareType.CPU:
+                case HardwareType.Cpu:
                     return "cpu.png";
                 case HardwareType.GpuNvidia:
                     return "nvidia.png";

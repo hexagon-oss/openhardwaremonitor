@@ -311,7 +311,7 @@ namespace OpenHardwareMonitor.Hardware.Nvidia {
       r.AppendLine("Nvidia GPU");
       r.AppendLine();
 
-      r.AppendFormat("Name: {0}{1}", name, Environment.NewLine);
+      r.AppendFormat("Name: {0}{1}", _name, Environment.NewLine);
       r.AppendFormat("Index: {0}{1}", adapterIndex, Environment.NewLine);
 
       if (displayHandle.HasValue && NVAPI.NvAPI_GetDisplayDriverVersion != null) {
