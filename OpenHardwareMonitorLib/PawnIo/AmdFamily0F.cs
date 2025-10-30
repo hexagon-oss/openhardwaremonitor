@@ -4,7 +4,7 @@ namespace OpenHardwareMonitor.PawnIo;
 
 public class AmdFamily0F
 {
-    private readonly PawnIo _pawnIO = PawnIo.LoadModuleFromResource(typeof(AmdFamily0F).Assembly, $"{nameof(LibreHardwareMonitor)}.Resources.PawnIo.AMDFamily0F.bin");
+    private readonly PawnIo _pawnIO = PawnIo.LoadModuleFromResource(typeof(AmdFamily0F).Assembly, $"{nameof(OpenHardwareMonitor)}.Resources.PawnIo.AMDFamily0F.bin");
 
     public bool ReadMsr(uint index, out uint eax, out uint edx)
     {

@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 
 // ReSharper disable InconsistentNaming
 
-namespace LibreHardwareMonitor.Interop;
+namespace OpenHardwareMonitor.Interop;
 
 internal class LibC
 {

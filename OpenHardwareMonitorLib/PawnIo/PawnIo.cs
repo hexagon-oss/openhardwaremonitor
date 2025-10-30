@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Windows.Win32.Foundation;
 using Windows.Win32.Storage.FileSystem;
-using LibreHardwareMonitor.Interop;
 using Microsoft.Win32;
 using Microsoft.Win32.SafeHandles;
 using PInvoke = Windows.Win32.PInvoke;

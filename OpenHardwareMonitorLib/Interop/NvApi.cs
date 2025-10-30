@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Windows.Win32;
 
-namespace LibreHardwareMonitor.Interop;
+namespace OpenHardwareMonitor.Interop;
 
 internal static class NvApi
 {

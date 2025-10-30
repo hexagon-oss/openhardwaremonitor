@@ -10,7 +10,7 @@ using Windows.Win32;
 
 // ReSharper disable InconsistentNaming
 
-namespace LibreHardwareMonitor.Interop;
+namespace OpenHardwareMonitor.Interop;
 
 internal static class AtiAdlxx
 {

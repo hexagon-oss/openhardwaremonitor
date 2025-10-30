@@ -15,7 +15,6 @@ using System.IO;
 using System.Linq;
 using System.Security.Permissions;
 using System.Reflection;
-using LibreHardwareMonitor.Hardware.Network;
 
 namespace OpenHardwareMonitor.Hardware;
 
@@ -133,7 +132,7 @@ public class Computer : IComputer
 
         if (_networkEnabled)
         {
-            Add(new NetworkGroup(settings));
+            Add(new Network.NetworkGroup(settings));
         }
 
         if (hddEnabled)
@@ -271,9 +270,9 @@ public class Computer : IComputer
             if (open && value != _networkEnabled)
             {
                 if (value)
-                    Add(new NetworkGroup(settings));
+                    Add(new Network.NetworkGroup(settings));
                 else
-                    RemoveType<NetworkGroup>();
+                    RemoveType<Network.NetworkGroup>();
             }
 
             _networkEnabled = value;

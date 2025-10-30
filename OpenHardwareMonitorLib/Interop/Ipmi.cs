@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace LibreHardwareMonitor.Interop;
+namespace OpenHardwareMonitor.Interop;
 
 internal static class Ipmi
 {

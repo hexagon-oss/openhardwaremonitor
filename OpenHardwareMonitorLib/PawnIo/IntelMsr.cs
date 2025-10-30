@@ -5,7 +5,7 @@ namespace OpenHardwareMonitor.PawnIo;
 public class IntelMsr
 {
     private readonly long[] _inArray = new long[1];
-    private readonly PawnIo _pawnIO = PawnIo.LoadModuleFromResource(typeof(IntelMsr).Assembly, $"{nameof(LibreHardwareMonitor)}.Resources.PawnIo.IntelMSR.bin");
+    private readonly PawnIo _pawnIO = PawnIo.LoadModuleFromResource(typeof(IntelMsr).Assembly, $"{nameof(OpenHardwareMonitor)}.Resources.PawnIo.IntelMSR.bin");
 
     public bool ReadMsr(uint index, out ulong value)
     {

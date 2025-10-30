@@ -8,7 +8,7 @@ using Windows.Win32.Storage.IscsiDisc;
 
 // ReSharper disable InconsistentNaming
 
-namespace LibreHardwareMonitor.Interop;
+namespace OpenHardwareMonitor.Interop;
 
 public unsafe class AtaSmart
 {

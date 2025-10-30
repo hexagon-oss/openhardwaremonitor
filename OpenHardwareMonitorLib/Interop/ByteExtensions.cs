@@ -1,6 +1,6 @@
 ﻿using Windows.Win32;
 
-namespace LibreHardwareMonitor.Interop;
+namespace OpenHardwareMonitor.Interop;
 
 #if NET8_0_OR_GREATER
 

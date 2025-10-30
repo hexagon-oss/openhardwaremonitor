@@ -8,7 +8,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using Windows.Win32;
 
-namespace LibreHardwareMonitor.Interop;
+namespace OpenHardwareMonitor.Interop;
 
 internal static class NvidiaML
 {

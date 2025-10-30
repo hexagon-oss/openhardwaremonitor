@@ -5,7 +5,7 @@ namespace OpenHardwareMonitor.PawnIo;
 
 public class RyzenSmu
 {
-    private readonly PawnIo _pawnIO = PawnIo.LoadModuleFromResource(typeof(IntelMsr).Assembly, $"{nameof(LibreHardwareMonitor)}.Resources.PawnIo.RyzenSMU.bin");
+    private readonly PawnIo _pawnIO = PawnIo.LoadModuleFromResource(typeof(IntelMsr).Assembly, $"{nameof(OpenHardwareMonitor)}.Resources.PawnIo.RyzenSMU.bin");
 
     public uint GetSmuVersion()
     {
