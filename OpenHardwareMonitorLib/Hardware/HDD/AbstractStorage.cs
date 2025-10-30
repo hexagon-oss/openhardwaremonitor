@@ -209,7 +209,7 @@ namespace OpenHardwareMonitor.Hardware.HDD {
     }
 
     public override HardwareType HardwareType {
-      get { return HardwareType.HDD; }
+      get { return HardwareType.Storage; }
     }
 
     protected virtual void UpdateSensors() {

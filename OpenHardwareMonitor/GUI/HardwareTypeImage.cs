@@ -41,7 +41,7 @@ namespace OpenHardwareMonitor.GUI {
           case HardwareType.GpuAmd:
             image = Utilities.EmbeddedResources.GetImage("amd.png");
             break;
-          case HardwareType.HDD:
+          case HardwareType.Storage:
             image = Utilities.EmbeddedResources.GetImage("hdd.png");
             break;
           case HardwareType.Heatmaster:

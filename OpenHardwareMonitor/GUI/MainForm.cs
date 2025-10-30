@@ -430,13 +430,15 @@ namespace OpenHardwareMonitor.GUI
             {
                 if (runWebServer.Value)
                 {
-                    server.Stop();
+                    server.StopHttpListener();
                     server.Dispose();
                     server = new GrapevineServer(root, computer, HttpServerPort, allowWebServerRemoteAccess.Value);
-                    server.Start();
+                    server.StartHttpListener();
                 }
                 else
-                    server.Stop();
+                {
+                    server.StopHttpListener();
+                }
             };
 
             logSensors = new UserOption("logSensorsMenuItem", false, logSensorsMenuItem,

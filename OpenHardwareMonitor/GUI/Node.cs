@@ -14,9 +14,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using Aga.Controls.Tree;
+using OpenHardwareMonitor.Hardware;
 
-namespace OpenHardwareMonitor.GUI {
-  public class Node {
+namespace OpenHardwareMonitor.GUI
+{
+  public class Node
+  {
 
     private TreeModel treeModel;
     private Node parent;

@@ -7,10 +7,11 @@ public enum HardwareType
     Cpu,
     RAM,
     GpuNvidia,
-    GpuAmd,    
+    GpuAmd,
+    GpuIntel,
     TBalancer,
     Heatmaster,
-    HDD,
+    Storage,
     Network,
     EmbeddedController,
 }

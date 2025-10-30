@@ -93,11 +93,17 @@ public class Motherboard : IHardware, IDisposable
         SubHardware = subHardwareList.ToArray();
     }
 
-    /// <inheritdoc />
+#pragma warning disable CS0067
+    /// <summary>
+    /// Unused, as the motherboard cannot be added or removed
+    /// </summary>
     public event SensorEventHandler SensorAdded;
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Unused, as the motherboard cannot be added or removed
+    /// </summary>
     public event SensorEventHandler SensorRemoved;
+#pragma warning restore CS0067
 
     /// <inheritdoc />
     public HardwareType HardwareType => HardwareType.Motherboard;
