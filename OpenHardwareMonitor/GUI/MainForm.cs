@@ -74,7 +74,7 @@ namespace OpenHardwareMonitor.GUI
 
         private UserOption runWebServer;
         private UserOption allowWebServerRemoteAccess;
-        private GrapevineServer server;
+        private RestServerImplementation server;
 
         private UserOption logSensors;
         private UserRadioGroup loggingInterval;
@@ -423,7 +423,7 @@ namespace OpenHardwareMonitor.GUI
                 }
             };
 
-            server = new GrapevineServer(root, computer, HttpServerPort, allowWebServerRemoteAccess.Value);
+            server = new RestServerImplementation(root, computer, "0.0.0.0", HttpServerPort, allowWebServerRemoteAccess.Value);
             runWebServer = new UserOption("runWebServer", false,
               runWebServerMenuItem, basicSettings, () => Program.Arguments.RunWebServer ? true : null);
             runWebServer.Changed += delegate (object sender, EventArgs e)
@@ -432,7 +432,7 @@ namespace OpenHardwareMonitor.GUI
                 {
                     server.StopHttpListener();
                     server.Dispose();
-                    server = new GrapevineServer(root, computer, HttpServerPort, allowWebServerRemoteAccess.Value);
+                    server = new RestServerImplementation(root, computer, "0.0.0.0", HttpServerPort, allowWebServerRemoteAccess.Value);
                     server.StartHttpListener();
                 }
                 else
@@ -496,7 +496,9 @@ namespace OpenHardwareMonitor.GUI
                 computer.Close();
                 SaveConfiguration();
                 if (runWebServer.Value)
-                    server.Stop();
+                {
+                    server.StopHttpListener();
+                }
             };
 
             treeView.ExpandAll();
@@ -997,7 +999,10 @@ namespace OpenHardwareMonitor.GUI
             computer.Close();
             SaveConfiguration();
             if (runWebServer.Value)
-                server.Stop();
+            {
+                server.StopHttpListener();
+            }
+
             systemTray.Dispose();
         }
 

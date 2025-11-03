@@ -24,7 +24,7 @@ using HttpUtility = System.Web.HttpUtility;
 
 namespace OpenHardwareMonitor.Utilities;
 
-public sealed class GrapevineServer : IDisposable, IGrapevineServer
+public sealed class RestServerImplementation : IDisposable
 {
     private readonly Computer _computer;
     private readonly HttpListener _listener;
@@ -33,7 +33,7 @@ public sealed class GrapevineServer : IDisposable, IGrapevineServer
     private CancellationTokenSource _cts;
     private Task _listenerTask;
 
-    public GrapevineServer(Node node, Computer computer, string listenerIp, int port, bool allowRemoteAccess)
+    public RestServerImplementation(Node node, Computer computer, string listenerIp, int port, bool allowRemoteAccess)
     {
         _root = node;
         ListenerPort = port;
@@ -56,12 +56,6 @@ public sealed class GrapevineServer : IDisposable, IGrapevineServer
     public int ListenerPort { get; set; }
 
     public bool AllowRemoteAccess { get; set; } // TODO: Doesn't do anything right now
-
-    public string Password
-    {
-        get { return PasswordSHA256; }
-        set { PasswordSHA256 = ComputeSHA256(value); }
-    }
 
     public bool PlatformNotSupported
     {
@@ -104,7 +98,7 @@ public sealed class GrapevineServer : IDisposable, IGrapevineServer
 
             _listener.Prefixes.Clear();
             _listener.Prefixes.Add(prefix);
-            _listener.Realm = "Libre Hardware Monitor";
+            _listener.Realm = "OpenHardwareMonitor";
             _listener.AuthenticationSchemes = AuthEnabled ? System.Net.AuthenticationSchemes.Basic : System.Net.AuthenticationSchemes.Anonymous;
             _listener.Start();
 
@@ -216,22 +210,26 @@ public sealed class GrapevineServer : IDisposable, IGrapevineServer
         }
     }
 
-    //Handles "/Sensor" requests.
-    //Parameters are taken from the query part of the URL.
-    //Get:
-    //http://localhost:8085/Sensor?action=Get&id=/some/node/path/0
-    //The output is either:
-    //{"result":"fail","message":"Some error message"}
-    //or:
-    //{"result":"ok","value":42.0, "format":"{0:F2} RPM"}
-    //
-    //Set:
-    //http://localhost:8085/Sensor?action=Set&id=/some/node/path/0&value=42.0
-    //http://localhost:8085/Sensor?action=Set&id=/some/node/path/0&value=null
-    //The output is either:
-    //{"result":"fail","message":"Some error message"}
-    //or:
-    //{"result":"ok"}
+    /// <summary>
+    /// Handles "/Sensor" requests.
+    /// Parameters are taken from the query part of the URL.
+    /// Get:
+    /// http://localhost:8085/Sensor?action=Get&id=/some/node/path/0
+    /// The output is either:
+    /// <code>{"result":"fail","message":"Some error message"}</code>
+    /// or:
+    /// <code>{"result":"ok","value":42.0, "format":"{0:F2} RPM"}</code>
+    /// 
+    /// Set:
+    /// http://localhost:8085/Sensor?action=Set&id=/some/node/path/0&value=42.0
+    /// http://localhost:8085/Sensor?action=Set&id=/some/node/path/0&value=null
+    /// The output is either:
+    /// <code>{"result":"fail","message":"Some error message"}</code>
+    /// or:
+    /// <code>{"result":"ok"}</code>
+    /// </summary>
+    /// <param name="request">The request arguments</param>
+    /// <param name="result">A dictionary to create the result json from</param>
     private void HandleSensorRequest(HttpListenerRequest request, Dictionary<string, object> result)
     {
         IDictionary<string, string> dict = ToDictionary(HttpUtility.ParseQueryString(request.Url.Query));
@@ -244,7 +242,8 @@ public sealed class GrapevineServer : IDisposable, IGrapevineServer
 
                 if (sNode == null)
                 {
-                    throw new ArgumentException("Unknown id " + dict["id"] + " specified");
+                    CreateErrorResult(result, new ArgumentException("Unknown id " + dict["id"] + " specified"));
+                    return;
                 }
 
                 if (dict["action"] == "ResetMinMax")
@@ -261,7 +260,8 @@ public sealed class GrapevineServer : IDisposable, IGrapevineServer
                         SetSensorControlValue(sNode, dict["value"]);
                         break;
                     case "Set":
-                        throw new ArgumentNullException("No value provided");
+                        CreateErrorResult(result, new ArgumentNullException("No value provided"));
+                        return;
                     case "Get":
                         result["value"] = sNode.Sensor.Value;
                         result["min"] = sNode.Sensor.Min;
@@ -269,17 +269,18 @@ public sealed class GrapevineServer : IDisposable, IGrapevineServer
                         result["format"] = sNode.Format;
                         break;
                     default:
-                        throw new ArgumentException("Unknown action type " + dict["action"]);
+                        CreateErrorResult(result, new ArgumentException("Unknown action '" + dict["action"] + "' specified"));
+                        return;
                 }
             }
             else
             {
-                throw new ArgumentNullException("No id provided");
+                CreateErrorResult(result, new ArgumentException("No id specified"));
             }
         }
         else
         {
-            throw new ArgumentNullException("No action provided");
+            CreateErrorResult(result, new ArgumentException("No action specified"));
         }
     }
 
@@ -307,10 +308,23 @@ public sealed class GrapevineServer : IDisposable, IGrapevineServer
         }
         catch (Exception e)
         {
-            result["result"] = "fail";
-            result["message"] = e.ToString();
+            CreateErrorResult(result, e);
         }
         return System.Text.Json.JsonSerializer.Serialize(result);
+    }
+
+    private void CreateErrorResult(Dictionary<string, object> result, Exception e)
+    {
+        if (e == null)
+        {
+            result["result"] = "ok";
+        }
+        else
+        {
+            result["result"] = "fail";
+            result["message"] = e.Message;
+            result["stack"] = e.ToString();
+        }
     }
 	
 	private IList<SensorNode> GetSensors(HardwareNode node)
@@ -350,8 +364,8 @@ public sealed class GrapevineServer : IDisposable, IGrapevineServer
         {
             try
             {
-                HttpListenerBasicIdentity identity = (HttpListenerBasicIdentity)context.User.Identity;
-                authenticated = (identity.Name == UserName) && (ComputeSHA256(identity.Password) == PasswordSHA256);
+                HttpListenerBasicIdentity identity = (HttpListenerBasicIdentity)context?.User?.Identity;
+                authenticated = identity != null && ((identity.Name == UserName) && (ComputeSHA256(identity.Password) == PasswordSHA256));
             }
             catch
             {
@@ -453,7 +467,7 @@ public sealed class GrapevineServer : IDisposable, IGrapevineServer
     private async Task ServeResourceFileAsync(HttpListenerResponse response, string name, string ext)
     {
         // resource names do not support the hyphen
-        name = "LibreHardwareMonitor.Resources." +
+        name = "OpenHardwareMonitor.Resources." +
                name.Replace("custom-theme", "custom_theme");
 
         string[] names = Assembly.GetExecutingAssembly().GetManifestResourceNames();
@@ -609,6 +623,7 @@ public sealed class GrapevineServer : IDisposable, IGrapevineServer
            { SensorType.TimeSpan, ("seconds", 1) },
            { SensorType.Timing, ("seconds", 0.000000001 ) },                  //originally nanoseconds
            { SensorType.Voltage, ("volts", 1) },
+           { SensorType.RawValue, ("", 1)}
         };
 
         for (int i = 0; i < node.Nodes.Count; i++)
@@ -991,7 +1006,7 @@ public sealed class GrapevineServer : IDisposable, IGrapevineServer
             case HardwareType.GpuNvidia:
                 return "nvidia.png";
             case HardwareType.GpuAmd:
-                return "ati.png";
+                return "amd.png";
             case HardwareType.GpuIntel:
                 return "intel.png";
             case HardwareType.Storage:
