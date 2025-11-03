@@ -24,7 +24,7 @@ using HttpUtility = System.Web.HttpUtility;
 
 namespace OpenHardwareMonitor.Utilities;
 
-public sealed class RestServerImplementation : IDisposable
+public sealed class RestServerImplementation : IDisposable, IRestServerImpl
 {
     private readonly Computer _computer;
     private readonly HttpListener _listener;
@@ -32,6 +32,7 @@ public sealed class RestServerImplementation : IDisposable
     private ILogger _logger;
     private CancellationTokenSource _cts;
     private Task _listenerTask;
+    private List<(object CommandInterface, MethodInfo Method, RestRouteAttribute Attribute)> _serviceImplementations;
 
     public RestServerImplementation(Node node, Computer computer, string listenerIp, int port, bool allowRemoteAccess)
     {
@@ -39,11 +40,12 @@ public sealed class RestServerImplementation : IDisposable
         ListenerPort = port;
         _computer = computer;
         ListenerIp = listenerIp;
+        _serviceImplementations = new();
         _listener = new HttpListener() { IgnoreWriteExceptions = true };
         _logger = this.GetCurrentClassLogger();
+        RegisterService(new RestCommandInterface(this));
     }
 
-   
     public void Dispose()
     {
         StopHttpListener();
@@ -385,27 +387,27 @@ public sealed class RestServerImplementation : IDisposable
                 }
                 case "GET":
                 {
-                    string requestedFile = request.RawUrl.Substring(1);
+                    string requestedFile = request.RawUrl ?? string.Empty;
 
-                    if (requestedFile == "data.json")
+                    if (requestedFile == "/data.json")
                     {
                         await SendJsonAsync(context.Response, request);
                         return;
                     }
 
-                    if (requestedFile == "metrics")
+                    if (requestedFile == "/metrics")
                     {
                         await SendPrometheusAsync(context.Response, request);
                         return;
                     }
 
-                    if (requestedFile.Contains("images_icon"))
+                    if (requestedFile.StartsWith("/images_icon", StringComparison.Ordinal))
                     {
-                        await ServeResourceImageAsync(context.Response, requestedFile.Replace("images_icon/", string.Empty));
+                        await ServeResourceImageAsync(context.Response, requestedFile.Replace("/images_icon/", string.Empty));
                         return;
                     }
 
-                    if (requestedFile.Contains("Sensor"))
+                    if (requestedFile.StartsWith("/Sensor", StringComparison.Ordinal))
                     {
                         var sensorResult = new Dictionary<string, object>();
                         HandleSensorRequest(request, sensorResult);
@@ -413,7 +415,7 @@ public sealed class RestServerImplementation : IDisposable
                         return;
                     }
 
-                    if (requestedFile.Contains("ResetAllMinMax"))
+                    if (requestedFile.StartsWith("/ResetAllMinMax", StringComparison.Ordinal))
                     {
                         _computer.Accept(new SensorVisitor(delegate (ISensor sensor)
                         {
@@ -424,11 +426,19 @@ public sealed class RestServerImplementation : IDisposable
                         return;
                     }
 
-                    // default file to be served
-                    if (string.IsNullOrEmpty(requestedFile))
-                        requestedFile = "index.html";
+                    if (await ExecuteServiceRequest("GET", context, requestedFile))
+                    {
+                        break;
+                    }
 
-                    string[] splits = requestedFile.Split('.');
+                    // default file to be served (remove the trailing slash first)
+                    requestedFile = requestedFile.Length > 0 ? requestedFile.Substring(1) : string.Empty;
+                    if (string.IsNullOrEmpty(requestedFile))
+                    {
+                        requestedFile = "index.html";
+                    }
+
+                    string[] splits = requestedFile.Substring(1).Split('.');
                     string ext = splits[splits.Length - 1];
                     await ServeResourceFileAsync(context.Response, "Web." + requestedFile.Replace('/', '.'), ext);
                     break;
@@ -462,6 +472,36 @@ public sealed class RestServerImplementation : IDisposable
         {
             // client closed connection before the content was sent
         }
+    }
+
+    private async Task<bool> ExecuteServiceRequest(string method, HttpListenerContext context, string requestedFile)
+    {
+        foreach (var service in _serviceImplementations)
+        {
+            if (service.Attribute.Method.Equals(method, StringComparison.OrdinalIgnoreCase))
+            {
+                if (requestedFile.StartsWith(service.Attribute.PathPrefix, StringComparison.Ordinal))
+                {
+                    // That's likely the service we need. Invoke it.
+                    try
+                    {
+                        Task reply = (Task)service.Method.Invoke(service.CommandInterface, BindingFlags.Instance, null,
+                            new[] { context },
+                            CultureInfo.InvariantCulture);
+                        await reply;
+                        return true;
+                    }
+                    catch (Exception x)
+                    {
+                        context.Response.StatusCode = 501;
+                        await SendResponseAsync(context, x.Message, "text/plain");
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     private async Task ServeResourceFileAsync(HttpListenerResponse response, string name, string ext)
@@ -789,13 +829,6 @@ public sealed class RestServerImplementation : IDisposable
         return json.ToString();
     }
 
-    public void JsonForType(StringBuilder json, TypeNode tn)
-    {
-        json.AppendLine("\"NodeId\": \"" + tn.NodeId + "\",");
-        json.AppendLine("\"Type\": \"" + tn.SensorType.ToString() + "\",");
-        json.AppendLine("\"Name\": \"" + tn.Text + "\",");
-    }
-
     public IList<HardwareNode> GetHardwareNodes(Node rootNode)
     {
         var ret = new List<HardwareNode>();
@@ -926,77 +959,6 @@ public sealed class RestServerImplementation : IDisposable
         }
     }
 
-    public String GetJson()
-    {
-
-        StringBuilder json = new StringBuilder("{\"id\": 0, \"Text\": \"Sensor\", \"Children\": [");
-        int nodeCount = 1;
-        GenerateJSON(json, _root, ref nodeCount);
-        json.Append("]");
-        json.Append(", \"Min\": \"Min\"");
-        json.Append(", \"Value\": \"Value\"");
-        json.Append(", \"Max\": \"Max\"");
-        json.Append(", \"ImageURL\": \"\"");
-        json.Append(", \"NodeId\": \"NodeId\"");
-        json.Append("}");
-
-        return json.ToString();
-    }
-
-    private void GenerateJSON(StringBuilder json, Node n, ref int nodeCount)
-    {
-        json.Append("{\"id\": " + nodeCount + ", \"Text\": \"" + n.Text
-                    + "\", \"Children\": [");
-        nodeCount++;
-
-        for (var index = 0; index < n.Nodes.Count; index++)
-        {
-            Node child = n.Nodes[index];
-            GenerateJSON(json, child, ref nodeCount);
-            if (index != n.Nodes.Count - 1)
-            {
-                json.Append(", ");
-            }
-        }
-
-        json.Append("]");
-
-        if (n is SensorNode sn)
-        {
-            json.Append(", \"Min\": \"" + sn.Min + "\"");
-            json.Append(", \"Value\": \"" + sn.Value + "\"");
-            json.Append(", \"Max\": \"" + sn.Max + "\"");
-            json.Append(", \"ImageURL\": \"images/transparent.png\"");
-            json.Append(", \"NodeId\": \"" + sn.Sensor.Identifier + "\"");
-        }
-        else if (n is HardwareNode hn)
-        {
-            json.Append(", \"Min\": \"\"");
-            json.Append(", \"Value\": \"\"");
-            json.Append(", \"Max\": \"\"");
-            json.Append(", \"ImageURL\": \"images_icon/" + GetHardwareImageFile(hn) + "\"");
-            json.Append(", \"NodeId\": \"" + hn.Hardware.Identifier + "\"");
-        }
-        else if (n is TypeNode tn)
-        {
-            json.Append(", \"Min\": \"\"");
-            json.Append(", \"Value\": \"\"");
-            json.Append(", \"Max\": \"\"");
-            json.Append(", \"ImageURL\": \"images_icon/" + GetTypeImageFile(tn) + "\"");
-            json.Append(", \"NodeId\": \"" + tn.Text + "\"");
-        }
-        else
-        {
-            json.Append(", \"Min\": \"\"");
-            json.Append(", \"Value\": \"\"");
-            json.Append(", \"Max\": \"\"");
-            json.Append(", \"ImageURL\": \"images_icon/computer.png\"");
-            json.Append(", \"NodeId\": \"/\"");
-        }
-
-        json.Append("}");
-    }
-
     private static string GetHardwareImageFile(HardwareNode hn)
     {
         switch (hn.Hardware.HardwareType)
@@ -1069,11 +1031,16 @@ public sealed class RestServerImplementation : IDisposable
                             .ComputeHash(Encoding.UTF8.GetBytes(text))
                             .Select(item => item.ToString("x2")));
     }
-    
 
-    private static async Task SendResponseAsync(HttpListenerResponse response, string content, string contentType)
+    public Task SendResponseAsync(HttpListenerContext context, string content, string contentType = "text/html")
+    {
+        return SendResponseAsync(context.Response, content, contentType);
+    }
+
+    public async Task SendResponseAsync(HttpListenerResponse response, string content, string contentType)
     {
         byte[] buffer = Encoding.UTF8.GetBytes(content);
+        response.ContentEncoding = Encoding.UTF8;
         response.ContentType = contentType;
         response.ContentLength64 = buffer.Length;
 
@@ -1082,7 +1049,24 @@ public sealed class RestServerImplementation : IDisposable
             await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
             response.OutputStream.Close();
         }
-        catch (HttpListenerException)
-        { }
+        catch (HttpListenerException x)
+        {
+            buffer = Encoding.UTF8.GetBytes(x.Message);
+            await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
+        }
+    }
+
+    public void RegisterService(object restCommandInterface)
+    {
+        Type t = restCommandInterface.GetType();
+        var methods = t.GetMethods(BindingFlags.Instance | BindingFlags.Public);
+        foreach (var method in methods)
+        {
+            RestRouteAttribute myAttribute = (RestRouteAttribute)method.GetCustomAttribute(typeof(RestRouteAttribute), true);
+            if (myAttribute != null)
+            {
+                _serviceImplementations.Add((restCommandInterface, method, myAttribute));
+            }
+        }
     }
 }
