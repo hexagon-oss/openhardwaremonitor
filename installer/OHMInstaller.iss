@@ -72,42 +72,34 @@ Name: "autostart"; Description: "Register OpenHardwareMonitor for Automatic Star
 Source: "OpenHardwareMonitor\bin\Release\OpenHardwareMonitor.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\Aga.Controls.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\CommandLine.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "OpenHardwareMonitor\bin\Release\Grapeseed.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "OpenHardwareMonitor\bin\Release\Grapevine.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\Microsoft.Extensions.Configuration.Abstractions.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "OpenHardwareMonitor\bin\Release\Microsoft.Extensions.Configuration.Binder.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "OpenHardwareMonitor\bin\Release\Microsoft.Extensions.Configuration.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "OpenHardwareMonitor\bin\Release\Microsoft.Extensions.Configuration.FileExtensions.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "OpenHardwareMonitor\bin\Release\Microsoft.Extensions.Configuration.Json.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\Microsoft.Extensions.DependencyInjection.Abstractions.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\Microsoft.Extensions.DependencyInjection.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "OpenHardwareMonitor\bin\Release\Microsoft.Extensions.FileProviders.Abstractions.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "OpenHardwareMonitor\bin\Release\Microsoft.Extensions.FileProviders.Physical.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "OpenHardwareMonitor\bin\Release\Microsoft.Extensions.FileSystemGlobbing.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\Microsoft.Extensions.Logging.Abstractions.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "OpenHardwareMonitor\bin\Release\Microsoft.Extensions.Logging.Configuration.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "OpenHardwareMonitor\bin\Release\Microsoft.Extensions.Logging.Console.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\Microsoft.Extensions.Logging.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "OpenHardwareMonitor\bin\Release\Microsoft.Extensions.Options.ConfigurationExtensions.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\Microsoft.Extensions.Options.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\Microsoft.Extensions.Primitives.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\NLog.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\NLog.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\NLog.Extensions.Logging.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "OpenHardwareMonitor\bin\Release\NLog.OutputDebugString.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\OpenHardwareMonitor.deps.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\OpenHardwareMonitor.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\OpenHardwareMonitor.dll.config"; DestDir: "{app}"; Flags: ignoreversion
-Source: "OpenHardwareMonitor\bin\Release\OpenHardwareMonitor.pdb"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\OpenHardwareMonitor.runtimeconfig.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\OpenHardwareMonitorLib.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "OpenHardwareMonitor\bin\Release\OpenHardwareMonitorLib.pdb"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\OxyPlot.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\OxyPlot.WindowsForms.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "OpenHardwareMonitor\bin\Release\RAMSPDToolkit-NDD.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "OpenHardwareMonitor\bin\Release\SpaceWizards.HttpListener.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "OpenHardwareMonitor\bin\Release\System.CodeDom.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\System.IO.Ports.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\System.Management.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "OpenHardwareMonitor\bin\Release\System.Threading.AccessControl.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenHardwareMonitor\bin\Release\ref\*"; DestDir: "{app}\ref"; Flags: ignoreversion recursesubdirs createallsubdirs skipifsourcedoesntexist
 Source: "OpenHardwareMonitor\bin\Release\runtimes\*"; DestDir: "{app}\runtimes"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "OpenHardwareMonitor\bin\Release\web\*"; DestDir: "{app}\web"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "installer\PawnIO_setup.exe"; DestDir: "{app}"; Flags: ignoreVersion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -115,6 +107,7 @@ Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
+Filename: "{app}\PawnIO_setup.exe"; Parameters: "-install -silent"; WorkingDir: "{app}"; Description: "Install PawnIO driver"; StatusMsg: "Installing PawnIO driver..."
 Filename: "{app}\{#MyAppExeName}"; Parameters: "--autostartupmode logon --closeall --startminimized --minimizetotray --run"; Flags: waituntilterminated; Description: "Performing post-install tasks"; Tasks: autostart; AfterInstall: DumpAllLogFiles
 Filename: "{app}\{#MyAppExeName}"; Parameters: "--startnormal"; Flags: nowait postinstall skipifsilent runascurrentuser; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"
 
@@ -124,7 +117,6 @@ Filename: "{app}\{#MyAppExeName}"; Parameters: "--autostartupmode disable --clos
 [UninstallDelete]
 Type: files; Name: "{app}\OpenHardwareMonitor.config"
 Type: files; Name: "{app}\OpenHardwareMonitor.config.backup"
-Type: files; Name: "{app}\OpenHardwareMonitorLib.sys"
 
 [InstallDelete]
 // On install/update reset the configuration. May not be exactly desirable, but avoids a number of possible errors

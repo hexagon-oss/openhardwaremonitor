@@ -1,9 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using OpenHardwareMonitor.GUI;
-using OpenHardwareMonitor.Hardware;
-using OpenHardwareMonitorLib;
-using OxyPlot;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Drawing;
@@ -18,6 +13,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Extensions.Logging;
+using OpenHardwareMonitor.GUI;
+using OpenHardwareMonitor.Hardware;
+using OpenHardwareMonitorLib;
+using OxyPlot;
 using SpaceWizards.HttpListener;
 using HttpUtility = System.Web.HttpUtility;
 
@@ -57,7 +57,7 @@ public sealed class RestServerImplementation : IDisposable, IRestServerImpl
 
     public int ListenerPort { get; set; }
 
-    public bool AllowRemoteAccess { get; set; } // TODO: Doesn't do anything right now
+    public bool AllowRemoteAccess { get; set; }
 
     public bool PlatformNotSupported
     {
@@ -135,6 +135,20 @@ public sealed class RestServerImplementation : IDisposable, IRestServerImpl
         return true;
     }
 
+    private bool IsOwnIp(System.Net.IPAddress address)
+    {
+        var host = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName());
+        foreach (System.Net.IPAddress ip in host.AddressList)
+        {
+            if (ip.Equals(address))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private async Task ProcessRequestsAsync(CancellationToken cancellationToken)
     {
         while (_listener.IsListening && !cancellationToken.IsCancellationRequested)
@@ -142,7 +156,18 @@ public sealed class RestServerImplementation : IDisposable, IRestServerImpl
             try
             {
                 var context = await _listener.GetContextAsync();
-                await Task.Run(() => HandleContextAsync(context), cancellationToken);
+                var remoteAddress = context.Request?.RemoteEndPoint?.Address;
+
+                if (remoteAddress == null || (AllowRemoteAccess == false
+                    && !(context.Request.RemoteEndPoint.Address.Equals(System.Net.IPAddress.IPv6Loopback) || context.Request.RemoteEndPoint.Address.Equals(System.Net.IPAddress.Loopback))
+                    && !IsOwnIp(remoteAddress)))
+                {
+                    await SendResponseAsync(context, "HTTP 404 forbidden", "text/plain");
+                }
+                else
+                {
+                    await Task.Run(() => HandleContextAsync(context), cancellationToken);
+                }
             }
             catch (HttpListenerException ex) when (ex.ErrorCode == 50)
             {
