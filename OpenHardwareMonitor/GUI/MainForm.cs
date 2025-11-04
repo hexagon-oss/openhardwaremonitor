@@ -200,6 +200,23 @@ namespace OpenHardwareMonitor.GUI
             computer.HardwareAdded += new HardwareEventHandler(HardwareAdded);
             computer.HardwareRemoved += new HardwareEventHandler(HardwareRemoved);
 
+            if (Program.Arguments.CloseAll == false && Program.Arguments.AutoStartupMode != AutoStartupMode.Bootup)
+            {
+                if (PawnIo.PawnIo.IsInstalled)
+                {
+                    if (PawnIo.PawnIo.Version < new Version(2, 0, 0, 0))
+                    {
+                        MessageBox.Show("PawnIO is outdated, please run setup first.", "OpenHardwareMonitor",
+                            MessageBoxButtons.OK);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("PawnIO is not installed, please run setup first.", "OpenHardwareMonitor",
+                        MessageBoxButtons.OK);
+                }
+            }
+
             computer.Open();
 
             Microsoft.Win32.SystemEvents.PowerModeChanged += PowerModeChanged;
