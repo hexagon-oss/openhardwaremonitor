@@ -678,6 +678,8 @@ namespace OpenHardwareMonitor.GUI {
             treeView.MouseDown += treeView_MouseDown;
             treeView.MouseMove += treeView_MouseMove;
             treeView.MouseUp += treeView_MouseUp;
+            treeView.Expanded += treeView_NodeExpanded;
+            treeView.Collapsed += treeview_NodeCollapsed;
             // 
             // MainForm
             // 

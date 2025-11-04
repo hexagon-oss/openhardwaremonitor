@@ -70,11 +70,18 @@ namespace Aga.Controls.Tree
 				InsertItem(index, item);
 			}
 		}
-		#endregion
+        #endregion
 
-		#region Events
+        internal TreeNodeAdv(TreeViewAdv tree, object tag)
+        {
+            _row = -1;
+            _tree = tree;
+            _nodes = new NodeCollection(this);
+            _children = new ReadOnlyCollection<TreeNodeAdv>(_nodes);
+            _tag = tag;
+        }
 
-		public event EventHandler<TreeViewAdvEventArgs> Collapsing;
+        public event EventHandler<TreeViewAdvEventArgs> Collapsing;
 		internal void OnCollapsing()
 		{
 			if (Collapsing != null)
@@ -102,9 +109,7 @@ namespace Aga.Controls.Tree
 				Expanded(this, new TreeViewAdvEventArgs(this));
 		}
 
-		#endregion
-
-		#region Properties
+        #region Properties
 
 		private TreeViewAdv _tree;
 		public TreeViewAdv Tree
@@ -187,14 +192,14 @@ namespace Aga.Controls.Tree
 			internal set { _isLeaf = value; }
 		}
 
-		private bool _isExpandedOnce;
+		private bool _isExpandedOnce = false;
 		public bool IsExpandedOnce
 		{
 			get { return _isExpandedOnce; }
 			internal set { _isExpandedOnce = value; }
 		}
 
-		private bool _isExpanded;
+		private bool _isExpanded = false;
 		public bool IsExpanded
 		{
 			get { return _isExpanded; }
@@ -362,20 +367,6 @@ namespace Aga.Controls.Tree
 		}
 
 		#endregion
-
-		public TreeNodeAdv(object tag)
-			: this(null, tag)
-		{
-		}
-
-		internal TreeNodeAdv(TreeViewAdv tree, object tag)
-		{
-			_row = -1;
-			_tree = tree;
-			_nodes = new NodeCollection(this);
-			_children = new ReadOnlyCollection<TreeNodeAdv>(_nodes);
-			_tag = tag;
-		}
 
 		public override string ToString()
 		{

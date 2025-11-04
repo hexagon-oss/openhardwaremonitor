@@ -13,8 +13,8 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using OpenHardwareMonitorLib;
 
-namespace OpenHardwareMonitor.Hardware.ATI {
-  
+namespace OpenHardwareMonitor.Hardware.Gpu
+{
   [StructLayout(LayoutKind.Sequential)]
   internal struct ADLAdapterInfo {
     public int Size;

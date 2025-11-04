@@ -30,8 +30,6 @@
     <Compile Include="..\Properties\AssemblyVersion.cs" Link="Properties\AssemblyVersion.cs" />
   </ItemGroup>
   <ItemGroup>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="RAMSPDToolkit-NDD" Version="1.3.2" />
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.235">
         <PrivateAssets>all</PrivateAssets>

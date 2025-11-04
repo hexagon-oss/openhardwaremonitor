@@ -1351,5 +1351,21 @@ namespace OpenHardwareMonitor.GUI
             secondInstanceService.Dispose();
             base.OnClosed(e);
         }
+
+        private void treeView_NodeExpanded(object sender, TreeViewAdvEventArgs e)
+        {
+            if (e.Node.Tag is OpenHardwareMonitor.GUI.Node hardware)
+            {
+                hardware.IsExpanded = e.Node.IsExpanded;
+            }
+        }
+
+        private void treeview_NodeCollapsed(object sender, TreeViewAdvEventArgs e)
+        {
+            if (e.Node.Tag is OpenHardwareMonitor.GUI.Node hardware)
+            {
+                hardware.IsExpanded = e.Node.IsExpanded;
+            }
+        }
     }
 }

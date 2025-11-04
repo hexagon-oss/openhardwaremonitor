@@ -13,8 +13,8 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace OpenHardwareMonitor.Hardware.Nvidia {
-
+namespace OpenHardwareMonitor.Hardware.Gpu 
+{
   internal enum NvStatus {
     OK = 0,
     ERROR = -1,
@@ -115,12 +115,12 @@ namespace OpenHardwareMonitor.Hardware.Nvidia {
 
   [StructLayout(LayoutKind.Sequential)]
   internal struct NvDisplayHandle {
-    private readonly IntPtr ptr;
+    private readonly nint ptr;
   }
 
   [StructLayout(LayoutKind.Sequential)]
   internal struct NvPhysicalGpuHandle {
-    private readonly IntPtr ptr;
+    private readonly nint ptr;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 8)]
@@ -296,7 +296,7 @@ namespace OpenHardwareMonitor.Hardware.Nvidia {
     public static readonly uint GPU_FAN_COOLERS_STATUS_VER = (uint)
       Marshal.SizeOf(typeof(NvFanCoolersStatus)) | 0x10000;
 
-    private delegate IntPtr nvapi_QueryInterfaceDelegate(uint id);
+    private delegate nint nvapi_QueryInterfaceDelegate(uint id);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate NvStatus NvAPI_InitializeDelegate();
@@ -448,7 +448,7 @@ namespace OpenHardwareMonitor.Hardware.Nvidia {
     }
 
     private static string GetDllName() {
-      if (IntPtr.Size == 4) {
+      if (nint.Size == 4) {
         return "nvapi.dll";
       } else {
         return "nvapi64.dll";
@@ -457,8 +457,8 @@ namespace OpenHardwareMonitor.Hardware.Nvidia {
 
     private static void GetDelegate<T>(uint id, out T newDelegate)
       where T : class {
-      IntPtr ptr = nvapi_QueryInterface(id);
-      if (ptr != IntPtr.Zero) {
+      nint ptr = nvapi_QueryInterface(id);
+      if (ptr != nint.Zero) {
         newDelegate =
           Marshal.GetDelegateForFunctionPointer(ptr, typeof(T)) as T;
       } else {

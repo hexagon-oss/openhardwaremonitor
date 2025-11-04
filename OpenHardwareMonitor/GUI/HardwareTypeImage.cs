@@ -62,6 +62,9 @@ namespace OpenHardwareMonitor.GUI {
           case HardwareType.Network:
             image = Utilities.EmbeddedResources.GetImage("network.png");
             break;
+          case HardwareType.GpuIntel:
+              image = Utilities.EmbeddedResources.GetImage("intel.png");
+              break;
           default:
             image = new Bitmap(1, 1);
             break;

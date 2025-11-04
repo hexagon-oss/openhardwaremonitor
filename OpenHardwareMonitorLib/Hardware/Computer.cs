@@ -13,8 +13,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Security.Permissions;
 using System.Reflection;
+using System.Runtime;
+using System.Security.Permissions;
+using System.Text.RegularExpressions;
+using OpenHardwareMonitor.Hardware.Cpu;
+using OpenHardwareMonitor.Hardware.Gpu;
 using OpenHardwareMonitor.Hardware.Motherboard;
 
 namespace OpenHardwareMonitor.Hardware;
@@ -121,8 +125,13 @@ public class Computer : IComputer
 
         if (gpuEnabled)
         {
-            Add(new ATI.ATIGroup(settings));
-            Add(new Nvidia.NvidiaGroup(settings));
+            Add(new Gpu.AmdGpuGroup(settings));
+            Add(new Gpu.NvidiaGroup(settings));
+
+            if (cpuEnabled)
+            {
+                Add(new IntelGpuGroup(GetIntelCpus(), settings));
+            }
         }
 
         if (fanControllerEnabled)
@@ -210,13 +219,18 @@ public class Computer : IComputer
             {
                 if (value)
                 {
-                    Add(new ATI.ATIGroup(settings));
-                    Add(new Nvidia.NvidiaGroup(settings));
+                    Add(new AmdGpuGroup(settings));
+                    Add(new NvidiaGroup(settings));
+                    if (CPUEnabled)
+                    {
+                        Add(new IntelGpuGroup(GetIntelCpus(), settings));
+                    }
                 }
                 else
                 {
-                    RemoveType<ATI.ATIGroup>();
-                    RemoveType<Nvidia.NvidiaGroup>();
+                    RemoveType<AmdGpuGroup>();
+                    RemoveType<NvidiaGroup>();
+                    RemoveType<IntelGpuGroup>();
                 }
             }
             gpuEnabled = value;
@@ -430,6 +444,13 @@ public class Computer : IComputer
             }
             return w.ToString();
         }
+    }
+
+    private List<IntelCpu> GetIntelCpus()
+    {
+        // Create a temporary cpu group if one has not been added.
+        IGroup cpuGroup = groups.Find(x => x is CpuGroup) ?? new CpuGroup(settings);
+        return cpuGroup.Hardware.Select(x => x as IntelCpu).ToList();
     }
 
     public void Close()
