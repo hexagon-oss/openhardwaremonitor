@@ -501,9 +501,27 @@ namespace OpenHardwareMonitor.GUI
                 }
             };
 
-            treeView.ExpandAll();
+            // treeView.ExpandAll();
+            InitExpandedState(treeView.Root);
             secondInstanceService.Run();
             secondInstanceService.OnSecondInstanceRequest += HandleSecondInstanceRequest;
+        }
+
+        /// <summary>
+        /// Sets up the initial state of the nodes based on the hardware components
+        /// </summary>
+        /// <param name="node"></param>
+        private void InitExpandedState(TreeNodeAdv node)
+        {
+            if (node.Tag is Node hardwareNode)
+            {
+                node.IsExpanded = hardwareNode.IsExpanded;
+            }
+
+            foreach (var n in node.Children)
+            {
+                InitExpandedState(n);
+            }
         }
 
         private void HandleSecondInstanceRequest(SecondInstanceService.SecondInstanceRequest requestType)
