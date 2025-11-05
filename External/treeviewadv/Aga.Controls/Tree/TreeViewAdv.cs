@@ -9,7 +9,6 @@ using System.Windows.Forms;
 using System.Collections;
 
 using Aga.Controls.Tree.NodeControls;
-using Aga.Controls.Threading;
 
 
 namespace Aga.Controls.Tree
@@ -40,7 +39,6 @@ namespace Aga.Controls.Tree
 		private TreeColumn _hotColumn;
 		private IncrementalSearch _search;
 		private List<TreeNodeAdv> _expandingNodes = new List<TreeNodeAdv>();
-		private AbortableThreadPool _threadPool = new AbortableThreadPool();
 		private Predicate<TreeNodeAdv> _viewNodeFilter = null;
 
 		#region Public Events
@@ -783,7 +781,6 @@ namespace Aga.Controls.Tree
 		{
 			lock (_expandingNodes)
 			{
-				_threadPool.CancelAll(true);
 				for (int i = 0; i < _expandingNodes.Count; i++)
 					_expandingNodes[i].IsExpandingNow = false;
 				_expandingNodes.Clear();
@@ -798,18 +795,12 @@ namespace Aga.Controls.Tree
 			eargs.Value = value;
 			eargs.IgnoreChildren = ignoreChildren;
 
-			if (AsyncExpanding && LoadOnDemand && !_threadPool.IsMyThread(Thread.CurrentThread))
-			{
-				WaitCallback wc = delegate(object argument) { SetIsExpanded((ExpandArgs)argument); };
-				_threadPool.QueueUserWorkItem(wc, eargs);
-			}
-			else
-				SetIsExpanded(eargs);
+			SetIsExpanded(eargs);
 		}
 
 		private void SetIsExpanded(ExpandArgs eargs)
 		{
-			bool update = !eargs.IgnoreChildren && !AsyncExpanding;
+			bool update = !eargs.IgnoreChildren;
 			if (update)
 				BeginUpdate();
 			try
@@ -845,15 +836,10 @@ namespace Aga.Controls.Tree
 
 			if (value && !node.IsExpandedOnce)
 			{
-				if (AsyncExpanding && LoadOnDemand)
-				{
-					AddExpandingNode(node);
-					node.AssignIsExpanded(true);
-					Invalidate();
-				}
-				ReadChilds(node, AsyncExpanding);
+				ReadChilds(node, false);
 				RemoveExpandingNode(node);
 			}
+
 			node.AssignIsExpanded(value);
 			SmartFullUpdate();
 

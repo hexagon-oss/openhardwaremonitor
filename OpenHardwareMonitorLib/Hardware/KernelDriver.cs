@@ -99,33 +99,6 @@ namespace OpenHardwareMonitor.Hardware {
       get { return device != null; }
     }
 
-    public bool DeviceIOControl(IOControlCode ioControlCode, object inBuffer) {
-      if (device == null)
-        return false;
-
-      uint bytesReturned;
-      bool b = NativeMethods.DeviceIoControl(device, ioControlCode,
-        inBuffer, inBuffer == null ? 0 : (uint)Marshal.SizeOf(inBuffer),
-        null, 0, out bytesReturned, IntPtr.Zero);
-      return b;
-    }
-
-    public bool DeviceIOControl<T>(IOControlCode ioControlCode, object inBuffer, 
-      ref T outBuffer) 
-    {
-      if (device == null)
-        return false;
-
-      object boxedOutBuffer = outBuffer;
-      uint bytesReturned;
-      bool b = NativeMethods.DeviceIoControl(device, ioControlCode,
-        inBuffer, inBuffer == null ? 0 : (uint)Marshal.SizeOf(inBuffer),
-        boxedOutBuffer, (uint)Marshal.SizeOf(boxedOutBuffer),
-        out bytesReturned, IntPtr.Zero);
-      outBuffer = (T)boxedOutBuffer;
-      return b;
-    }
-
     public void Close() {
       if (device != null) {
         device.Close();
@@ -278,14 +251,6 @@ namespace OpenHardwareMonitor.Hardware {
       [return: MarshalAs(UnmanagedType.Bool)]
       public static extern bool ControlService(IntPtr hService,
         ServiceControl dwControl, ref ServiceStatus lpServiceStatus);
-
-      [DllImport(KERNEL, CallingConvention = CallingConvention.Winapi)]
-      public static extern bool DeviceIoControl(SafeFileHandle device,
-        IOControlCode ioControlCode, 
-        [MarshalAs(UnmanagedType.AsAny)] [In] object inBuffer, 
-        uint inBufferSize,
-        [MarshalAs(UnmanagedType.AsAny)] [Out] object outBuffer,
-        uint nOutBufferSize, out uint bytesReturned, IntPtr overlapped);
 
       [DllImport(KERNEL, CallingConvention = CallingConvention.Winapi, 
         SetLastError = true)]

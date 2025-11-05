@@ -203,7 +203,7 @@ namespace OpenHardwareMonitor.GUI {
             mainMenu.Location = new System.Drawing.Point(0, 0);
             mainMenu.Name = "mainMenu";
             mainMenu.Padding = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            mainMenu.Size = new System.Drawing.Size(1540, 35);
+            mainMenu.Size = new System.Drawing.Size(873, 35);
             mainMenu.TabIndex = 0;
             // 
             // fileMenuItem
@@ -601,7 +601,7 @@ namespace OpenHardwareMonitor.GUI {
             // aboutMenuItem
             // 
             aboutMenuItem.Name = "aboutMenuItem";
-            aboutMenuItem.Size = new System.Drawing.Size(180, 22);
+            aboutMenuItem.Size = new System.Drawing.Size(107, 22);
             aboutMenuItem.Text = "About";
             aboutMenuItem.Click += aboutMenuItem_Click;
             // 
@@ -636,9 +636,9 @@ namespace OpenHardwareMonitor.GUI {
             // splitContainer.Panel1
             // 
             splitContainer.Panel1.Controls.Add(treeView);
-            splitContainer.Size = new System.Drawing.Size(1540, 810);
-            splitContainer.SplitterDistance = 590;
-            splitContainer.SplitterWidth = 38;
+            splitContainer.Size = new System.Drawing.Size(873, 472);
+            splitContainer.SplitterDistance = 343;
+            splitContainer.SplitterWidth = 25;
             splitContainer.TabIndex = 3;
             // 
             // treeView
@@ -669,7 +669,7 @@ namespace OpenHardwareMonitor.GUI {
             treeView.NodeControls.Add(nodeTextBoxMax);
             treeView.NodeFilter = null;
             treeView.SelectedNode = null;
-            treeView.Size = new System.Drawing.Size(1540, 590);
+            treeView.Size = new System.Drawing.Size(873, 343);
             treeView.TabIndex = 0;
             treeView.Text = "treeView";
             treeView.UseColumns = true;
@@ -678,12 +678,14 @@ namespace OpenHardwareMonitor.GUI {
             treeView.MouseDown += treeView_MouseDown;
             treeView.MouseMove += treeView_MouseMove;
             treeView.MouseUp += treeView_MouseUp;
+            treeView.Expanded += treeView_NodeExpanded;
+            treeView.Collapsed += treeview_NodeCollapsed;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            ClientSize = new System.Drawing.Size(1540, 845);
+            ClientSize = new System.Drawing.Size(873, 507);
             Controls.Add(splitContainer);
             Controls.Add(mainMenu);
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");

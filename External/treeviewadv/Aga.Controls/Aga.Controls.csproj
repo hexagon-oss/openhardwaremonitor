@@ -19,4 +19,7 @@
   <ItemGroup>
     <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Threading\" />
+  </ItemGroup>
 </Project>

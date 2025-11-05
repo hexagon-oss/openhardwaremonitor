@@ -123,7 +123,7 @@ namespace OpenHardwareMonitor.Hardware.HDD {
 
     private void AddSensor(string name, int index, bool defaultHidden,
       SensorType sensorType, GetSensorValue getValue) {
-      NVMeSensor sensor = new NVMeSensor(name, index, defaultHidden, sensorType, this, settings, getValue);
+      NVMeSensor sensor = new NVMeSensor(name, index, defaultHidden, sensorType, this, _settings, getValue);
       ActivateSensor(sensor);
       sensors.Add(sensor);
     }

@@ -10,24 +10,12 @@
 
 using System;
 
-namespace OpenHardwareMonitor.Hardware {
+namespace OpenHardwareMonitor.Hardware;
 
-  public delegate void SensorEventHandler(ISensor sensor);
-  
-  public enum HardwareType {
-    Mainboard,
-    SuperIO,
-    CPU,
-    RAM,
-    GpuNvidia,
-    GpuAti,    
-    TBalancer,
-    Heatmaster,
-    HDD,
-    Network
-  }
+public delegate void SensorEventHandler(ISensor sensor);
 
-  public interface IHardware : IElement, IDisposable {
+public interface IHardware : IElement, IDisposable
+{
 
     string Name { get; set; }
     Identifier Identifier { get; }
@@ -46,5 +34,4 @@ namespace OpenHardwareMonitor.Hardware {
 
     event SensorEventHandler SensorAdded;
     event SensorEventHandler SensorRemoved;
-  }
 }

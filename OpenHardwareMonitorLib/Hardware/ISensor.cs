@@ -14,22 +14,30 @@ using OpenHardwareMonitor.Collections;
 
 namespace OpenHardwareMonitor.Hardware {
 
-  public enum SensorType {
+  public enum SensorType
+  {
     Voltage, // V
+    Current, // A
+    Power, // W
     Clock, // MHz
     Temperature, // °C
     Load, // %
+    Frequency, // Hz
     Fan, // RPM
     Flow, // L/h
     Control, // %
     Level, // %
     Factor, // 1
-    Power, // W
     Data, // GB = 2^30 Bytes    
     SmallData, // MB = 2^20 Bytes
     Throughput, // MB/s = 2^20 Bytes/s
     RawValue, // i.e. Number of something
     TimeSpan, // s
+    Timing, // ns
+    Energy, // mWh
+    Noise, // dBA
+    Conductivity, // uS/cm
+    Humidity // %
   }
 
   public struct SensorValue {

@@ -260,7 +260,14 @@ namespace OpenHardwareMonitor.GUI
         private void DeleteRegistryRun()
         {
             RegistryKey key = Registry.CurrentUser.CreateSubKey(REGISTRY_RUN);
-            key.DeleteValue("OpenHardwareMonitor");
+            try
+            {
+                key.DeleteValue("OpenHardwareMonitor");
+            }
+            catch (ArgumentException x)
+            {
+                _logger.LogError($"Unable to delete registry key {key}: {x.Message}");
+            }
         }
 
         public bool IsAvailable

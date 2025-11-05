@@ -5,9 +5,9 @@
 	 - Copyright (C) 2012 Prince Samuel <prince.samuel@gmail.com>  -->
 
 <html>
-  <head>
-    <title>Open Hardware Monitor - Web Version</title>
-    <link rel="icon" type="image/png" href="images_icon/icon.png" />
+<head>
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <title>OpenHardwareMonitor - Web Version</title>
     <script type='text/javascript' src='js/jquery-1.7.2.min.js'></script>
     <script type='text/javascript' src='js/jquery.tmpl.min.js'></script>
     <script type='text/javascript' src='js/knockout-2.1.0.min.js'></script>
@@ -20,19 +20,20 @@
     <link href="css/ohm_web.css" rel="stylesheet" type="text/css" />
     <script type='text/javascript' src='js/jquery-ui-1.8.16.custom.min.js'></script>
     <style>
-      #toolbar {
-        padding: 10px 10px;
-      }
-      #slider {
-        display: inline-block;
-        width: 100px;
-      }
+        #toolbar {
+            padding: 10px 10px;
+        }
+
+        #slider {
+            display: inline-block;
+            width: 100px;
+        }
     </style>
 
 
     <script type='text/javascript' src='js/ohm_web.js'></script>
 
-  </head>
+</head>
 
   <body>
 
@@ -47,14 +48,13 @@
 
     <div class="main">
       <table data-bind="treeTable: flattened, treeOptions: { initialState: 'expanded', clickableNodeNames: true } ">
-          <thead><td>Sensor</td><td>Min</td><td>Value</td><td>Max</td><!-- <td>NodeId</td> -->
+        <thead><td>Sensor</td><td>Min</td><td>Value</td><td>Max</td>
           <tbody data-bind="foreach: flattened">
             <tr data-bind="attr: { 'id': 'node-' + id(), 'class': parent.id()?'child-of-node-' + parent.id():'' }">
               <td data-bind="html: '<img src=' + ImageURL() + ' />&nbsp; ' + Text()"></td>
               <td data-bind="text: Min"></td>
               <td data-bind="text: Value"></td>
-                <td data-bind="text: Max"></td>
-                <!-- Only for testing <td data-bind="text: NodeId"></td> -->
+              <td data-bind="text: Max"></td>
             </tr>
           </tbody>
         </table>

@@ -12,120 +12,153 @@ using System;
 using System.Collections.Generic;
 using OpenHardwareMonitor.Hardware;
 
-namespace OpenHardwareMonitor.GUI {
-  public class HardwareNode : Node {
-
-    private readonly PersistentSettings settings;
-    private readonly UnitManager unitManager;
-    private readonly IHardware hardware;
-    private readonly Identifier expandedIdentifier;
-
-    private List<TypeNode> typeNodes = new List<TypeNode>();
-
-    public HardwareNode(IHardware hardware, PersistentSettings settings, 
-      UnitManager unitManager) : base() 
+namespace OpenHardwareMonitor.GUI
+{
+    public class HardwareNode : Node
     {
-      this.settings = settings;
-      this.unitManager = unitManager;
-      this.hardware = hardware;
-      this.Image = HardwareTypeImage.Instance.GetImage(hardware.HardwareType);
 
-      foreach (SensorType sensorType in Enum.GetValues(typeof(SensorType)))
-        typeNodes.Add(new TypeNode(sensorType, hardware, settings));
+        private readonly PersistentSettings settings;
+        private readonly UnitManager unitManager;
+        private readonly IHardware hardware;
+        private readonly Identifier expandedIdentifier;
 
-      foreach (ISensor sensor in hardware.Sensors)
-        SensorAdded(sensor);
+        private List<TypeNode> typeNodes = new List<TypeNode>();
 
-      hardware.SensorAdded +=new SensorEventHandler(SensorAdded);
-      hardware.SensorRemoved += new SensorEventHandler(SensorRemoved);
+        public HardwareNode(IHardware hardware, PersistentSettings settings,
+          UnitManager unitManager) : base()
+        {
+            this.settings = settings;
+            this.unitManager = unitManager;
+            this.hardware = hardware;
+            this.Image = HardwareTypeImage.Instance.GetImage(hardware.HardwareType);
 
-      this.expandedIdentifier = new Identifier(hardware.Identifier, "expanded");
-      base.IsExpanded = 
-        settings.GetValue(expandedIdentifier.ToString(), base.IsExpanded);
-    }
+            foreach (SensorType sensorType in Enum.GetValues(typeof(SensorType)))
+            {
+                typeNodes.Add(new TypeNode(sensorType, hardware, settings));
+            }
 
-    public override string Text {
-      get { return hardware.Name; }
-      set { hardware.Name = value; }
-    }
+            foreach (ISensor sensor in hardware.Sensors)
+            {
+                SensorAdded(sensor);
+            }
 
-    public IHardware Hardware {
-      get { return hardware; }
-    }
+            hardware.SensorAdded += new SensorEventHandler(SensorAdded);
+            hardware.SensorRemoved += new SensorEventHandler(SensorRemoved);
 
-    public override string NodeId => Hardware.Identifier.ToString();
-
-    public override bool IsExpanded {
-      get {
-        return base.IsExpanded;
-      }
-      set {
-        if (base.IsExpanded != value) {
-          base.IsExpanded = value;
-          settings.SetValue(expandedIdentifier.ToString(), value);
+            this.expandedIdentifier = new Identifier(hardware.Identifier, ".expanded");
+            base.IsExpanded = settings.GetValue(expandedIdentifier.ToString(), true);
         }
-      }
-    }
 
-    private void UpdateNode(TypeNode node) {  
-      if (node.Nodes.Count > 0) {
-        if (!Nodes.Contains(node)) {
-          int i = 0;
-          while (i < Nodes.Count &&
-            ((TypeNode)Nodes[i]).SensorType < node.SensorType)
-            i++;
-          Nodes.Insert(i, node);  
+        public override string Text
+        {
+            get
+            {
+                return hardware.Name;
+            }
+            set
+            {
+                hardware.Name = value;
+            }
         }
-      } else {
-        if (Nodes.Contains(node))
-          Nodes.Remove(node);
-      }
-    }
 
-    private void SensorRemoved(ISensor sensor) {
-      foreach (TypeNode typeNode in typeNodes)
-        if (typeNode.SensorType == sensor.SensorType) { 
-          SensorNode sensorNode = null;
-          foreach (Node node in typeNode.Nodes) {
-            SensorNode n = node as SensorNode;
-            if (n != null && n.Sensor == sensor)
-              sensorNode = n;
-          }
-          if (sensorNode != null) {
-            sensorNode.PlotSelectionChanged -= SensorPlotSelectionChanged;
-            typeNode.Nodes.Remove(sensorNode);
-            UpdateNode(typeNode);
-          }
+        public IHardware Hardware
+        {
+            get
+            {
+                return hardware;
+            }
         }
-      if (PlotSelectionChanged != null)
-        PlotSelectionChanged(this, null);
-    }
 
-    private void InsertSorted(Node node, ISensor sensor) {
-      int i = 0;
-      while (i < node.Nodes.Count &&
-        ((SensorNode)node.Nodes[i]).Sensor.Index < sensor.Index)
-        i++;
-      SensorNode sensorNode = new SensorNode(sensor, settings, unitManager);
-      sensorNode.PlotSelectionChanged += SensorPlotSelectionChanged;
-      node.Nodes.Insert(i, sensorNode);
-    }
+        public override string NodeId => Hardware.Identifier.ToString();
 
-    private void SensorPlotSelectionChanged(object sender, EventArgs e) {
-      if (PlotSelectionChanged != null)
-        PlotSelectionChanged(this, null);
-    }
-
-    private void SensorAdded(ISensor sensor) {
-      foreach (TypeNode typeNode in typeNodes)
-        if (typeNode.SensorType == sensor.SensorType) {
-          InsertSorted(typeNode, sensor);
-          UpdateNode(typeNode);          
+        public override bool IsExpanded
+        {
+            get
+            {
+                return base.IsExpanded;
+            }
+            set
+            {
+                if (base.IsExpanded != value)
+                {
+                    base.IsExpanded = value;
+                    settings.SetValue(expandedIdentifier.ToString(), value);
+                }
+            }
         }
-      if (PlotSelectionChanged != null)
-        PlotSelectionChanged(this, null);
-    }
 
-    public event EventHandler PlotSelectionChanged;
-  }
+        private void UpdateNode(TypeNode node)
+        {
+            if (node.Nodes.Count > 0)
+            {
+                if (!Nodes.Contains(node))
+                {
+                    int i = 0;
+                    while (i < Nodes.Count &&
+                      ((TypeNode)Nodes[i]).SensorType < node.SensorType)
+                        i++;
+                    Nodes.Insert(i, node);
+                }
+            }
+            else
+            {
+                if (Nodes.Contains(node))
+                    Nodes.Remove(node);
+            }
+        }
+
+        private void SensorRemoved(ISensor sensor)
+        {
+            foreach (TypeNode typeNode in typeNodes)
+                if (typeNode.SensorType == sensor.SensorType)
+                {
+                    SensorNode sensorNode = null;
+                    foreach (Node node in typeNode.Nodes)
+                    {
+                        SensorNode n = node as SensorNode;
+                        if (n != null && n.Sensor == sensor)
+                            sensorNode = n;
+                    }
+                    if (sensorNode != null)
+                    {
+                        sensorNode.PlotSelectionChanged -= SensorPlotSelectionChanged;
+                        typeNode.Nodes.Remove(sensorNode);
+                        UpdateNode(typeNode);
+                    }
+                }
+            if (PlotSelectionChanged != null)
+                PlotSelectionChanged(this, null);
+        }
+
+        private void InsertSorted(Node node, ISensor sensor)
+        {
+            int i = 0;
+            while (i < node.Nodes.Count &&
+              ((SensorNode)node.Nodes[i]).Sensor.Index < sensor.Index)
+                i++;
+            SensorNode sensorNode = new SensorNode(sensor, settings, unitManager);
+            sensorNode.PlotSelectionChanged += SensorPlotSelectionChanged;
+            node.Nodes.Insert(i, sensorNode);
+        }
+
+        private void SensorPlotSelectionChanged(object sender, EventArgs e)
+        {
+            if (PlotSelectionChanged != null)
+                PlotSelectionChanged(this, null);
+        }
+
+        private void SensorAdded(ISensor sensor)
+        {
+            foreach (TypeNode typeNode in typeNodes)
+                if (typeNode.SensorType == sensor.SensorType)
+                {
+                    InsertSorted(typeNode, sensor);
+                    UpdateNode(typeNode);
+                }
+            if (PlotSelectionChanged != null)
+                PlotSelectionChanged(this, null);
+        }
+
+        public event EventHandler PlotSelectionChanged;
+    }
 }

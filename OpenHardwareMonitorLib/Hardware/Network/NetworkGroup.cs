@@ -10,7 +10,7 @@ using System.Net.NetworkInformation;
 using System.Text;
 using OpenHardwareMonitor.Hardware;
 
-namespace LibreHardwareMonitor.Hardware.Network
+namespace OpenHardwareMonitor.Hardware.Network
 {
     internal class NetworkGroup : IGroup
     {

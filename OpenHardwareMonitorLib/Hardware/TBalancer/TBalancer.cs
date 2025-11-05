@@ -106,7 +106,7 @@ namespace OpenHardwareMonitor.Hardware.TBalancer {
       if (deactivating.Contains(sensor)) {
         deactivating.Remove(sensor);
         base.DeactivateSensor(sensor);
-      } else if (active.Contains(sensor)) {
+      } else if (_active.Contains(sensor)) {
         deactivating.Add(sensor);
       }     
     }
@@ -132,7 +132,7 @@ namespace OpenHardwareMonitor.Hardware.TBalancer {
         if (miniNGFans[number * 2 + i] == null)
           miniNGFans[number * 2 + i] = 
             new Sensor("miniNG #" + (number + 1) + " Fan Channel " + (i + 1),
-            4 + number * 2 + i, SensorType.Fan, this, settings);
+            4 + number * 2 + i, SensorType.Fan, this, _settings);
         
         Sensor sensor = miniNGFans[number * 2 + i];
 
@@ -208,7 +208,7 @@ namespace OpenHardwareMonitor.Hardware.TBalancer {
             fans[i] = new Sensor("Fan Channel " + i, i, SensorType.Fan,
               this, new [] { new ParameterDescription("MaxRPM", 
                   "Maximum revolutions per minute (RPM) of the fan.", maxRPM)
-              }, settings);
+              }, _settings);
 
           float value;
           if ((data[136] & (1 << i)) == 0)  // pwm mode

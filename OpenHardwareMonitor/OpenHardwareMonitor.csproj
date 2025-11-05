@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+        <ForceDesignerDpiUnaware>true</ForceDesignerDpiUnaware>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
@@ -16,32 +17,7 @@
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Resources\ati.png" />
-    <None Remove="Resources\barback.png" />
-    <None Remove="Resources\barblue.png" />
-    <None Remove="Resources\bigng.png" />
-    <None Remove="Resources\chip.png" />
-    <None Remove="Resources\clock.png" />
-    <None Remove="Resources\computer.png" />
-    <None Remove="Resources\control.png" />
-    <None Remove="Resources\cpu.png" />
-    <None Remove="Resources\data.png" />
-    <None Remove="Resources\factor.png" />
-    <None Remove="Resources\fan.png" />
-    <None Remove="Resources\flow.png" />
-    <None Remove="Resources\gadget.png" />
-    <None Remove="Resources\hdd.png" />
-    <None Remove="Resources\level.png" />
-    <None Remove="Resources\load.png" />
-    <None Remove="Resources\mainboard.png" />
-    <None Remove="Resources\network.png" />
-    <None Remove="Resources\nvidia.png" />
-    <None Remove="Resources\power.png" />
-    <None Remove="Resources\ram.png" />
-    <None Remove="Resources\smallicon.ico" />
-    <None Remove="Resources\temperature.png" />
-    <None Remove="Resources\throughput.png" />
-    <None Remove="Resources\voltage.png" />
+    <None Remove="Resources\*.png" />
     <None Remove="Resources\Web\**\*.*" />
     <None Include="..\LICENSE.txt">
       <Pack>True</Pack>
@@ -53,32 +29,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\ati.png" />
-    <EmbeddedResource Include="Resources\barback.png" />
-    <EmbeddedResource Include="Resources\barblue.png" />
-    <EmbeddedResource Include="Resources\bigng.png" />
-    <EmbeddedResource Include="Resources\chip.png" />
-    <EmbeddedResource Include="Resources\clock.png" />
-    <EmbeddedResource Include="Resources\computer.png" />
-    <EmbeddedResource Include="Resources\control.png" />
-    <EmbeddedResource Include="Resources\cpu.png" />
-    <EmbeddedResource Include="Resources\data.png" />
-    <EmbeddedResource Include="Resources\factor.png" />
-    <EmbeddedResource Include="Resources\fan.png" />
-    <EmbeddedResource Include="Resources\flow.png" />
-    <EmbeddedResource Include="Resources\gadget.png" />
-    <EmbeddedResource Include="Resources\hdd.png" />
-    <EmbeddedResource Include="Resources\level.png" />
-    <EmbeddedResource Include="Resources\load.png" />
-    <EmbeddedResource Include="Resources\mainboard.png" />
-    <EmbeddedResource Include="Resources\network.png" />
-    <EmbeddedResource Include="Resources\nvidia.png" />
-    <EmbeddedResource Include="Resources\power.png" />
-    <EmbeddedResource Include="Resources\ram.png" />
+    <EmbeddedResource Include="Resources\*.png" />
     <EmbeddedResource Include="Resources\smallicon.ico" />
-    <EmbeddedResource Include="Resources\temperature.png" />
-    <EmbeddedResource Include="Resources\throughput.png" />
-    <EmbeddedResource Include="Resources\voltage.png" />
     <EmbeddedResource Include="Resources\Web\**\*.*" />
   </ItemGroup>
   <ItemGroup>
@@ -86,10 +38,13 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="Grapevine" Version="5.0.0-rc.10" />
-    <PackageReference Include="NLog" Version="5.3.4" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.14" />
+    <PackageReference Include="NLog" Version="6.0.5" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="6.0.5" />
+    <PackageReference Include="NLog.OutputDebugString" Version="6.0.5" />
     <PackageReference Include="OxyPlot.WindowsForms" Version="2.0.0" />
+    <PackageReference Include="SpaceWizards.HttpListener" Version="0.2.0" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\External\treeviewadv\Aga.Controls\Aga.Controls.csproj" />

@@ -74,7 +74,7 @@ namespace OpenHardwareMonitor.GUI
 
         private UserOption runWebServer;
         private UserOption allowWebServerRemoteAccess;
-        private GrapevineServer server;
+        private RestServerImplementation server;
 
         private UserOption logSensors;
         private UserRadioGroup loggingInterval;
@@ -199,6 +199,23 @@ namespace OpenHardwareMonitor.GUI
 
             computer.HardwareAdded += new HardwareEventHandler(HardwareAdded);
             computer.HardwareRemoved += new HardwareEventHandler(HardwareRemoved);
+
+            if (Program.Arguments.CloseAll == false && Program.Arguments.AutoStartupMode != AutoStartupMode.Bootup)
+            {
+                if (PawnIo.PawnIo.IsInstalled)
+                {
+                    if (PawnIo.PawnIo.Version < new Version(2, 0, 0, 0))
+                    {
+                        MessageBox.Show("PawnIO is outdated, please run setup first.", "OpenHardwareMonitor",
+                            MessageBoxButtons.OK);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("PawnIO is not installed, please run setup first.", "OpenHardwareMonitor",
+                        MessageBoxButtons.OK);
+                }
+            }
 
             computer.Open();
 
@@ -423,20 +440,22 @@ namespace OpenHardwareMonitor.GUI
                 }
             };
 
-            server = new GrapevineServer(root, computer, HttpServerPort, allowWebServerRemoteAccess.Value);
+            server = new RestServerImplementation(root, computer, "0.0.0.0", HttpServerPort, allowWebServerRemoteAccess.Value);
             runWebServer = new UserOption("runWebServer", false,
               runWebServerMenuItem, basicSettings, () => Program.Arguments.RunWebServer ? true : null);
             runWebServer.Changed += delegate (object sender, EventArgs e)
             {
                 if (runWebServer.Value)
                 {
-                    server.Stop();
+                    server.StopHttpListener();
                     server.Dispose();
-                    server = new GrapevineServer(root, computer, HttpServerPort, allowWebServerRemoteAccess.Value);
-                    server.Start();
+                    server = new RestServerImplementation(root, computer, "0.0.0.0", HttpServerPort, allowWebServerRemoteAccess.Value);
+                    server.StartHttpListener();
                 }
                 else
-                    server.Stop();
+                {
+                    server.StopHttpListener();
+                }
             };
 
             logSensors = new UserOption("logSensorsMenuItem", false, logSensorsMenuItem,
@@ -494,12 +513,32 @@ namespace OpenHardwareMonitor.GUI
                 computer.Close();
                 SaveConfiguration();
                 if (runWebServer.Value)
-                    server.Stop();
+                {
+                    server.StopHttpListener();
+                }
             };
 
-            treeView.ExpandAll();
+            // treeView.ExpandAll();
+            InitExpandedState(treeView.Root);
             secondInstanceService.Run();
             secondInstanceService.OnSecondInstanceRequest += HandleSecondInstanceRequest;
+        }
+
+        /// <summary>
+        /// Sets up the initial state of the nodes based on the hardware components
+        /// </summary>
+        /// <param name="node"></param>
+        private void InitExpandedState(TreeNodeAdv node)
+        {
+            if (node.Tag is Node hardwareNode)
+            {
+                node.IsExpanded = hardwareNode.IsExpanded;
+            }
+
+            foreach (var n in node.Children)
+            {
+                InitExpandedState(n);
+            }
         }
 
         private void HandleSecondInstanceRequest(SecondInstanceService.SecondInstanceRequest requestType)
@@ -995,7 +1034,10 @@ namespace OpenHardwareMonitor.GUI
             computer.Close();
             SaveConfiguration();
             if (runWebServer.Value)
-                server.Stop();
+            {
+                server.StopHttpListener();
+            }
+
             systemTray.Dispose();
         }
 
@@ -1343,6 +1385,22 @@ namespace OpenHardwareMonitor.GUI
             secondInstanceService.OnSecondInstanceRequest -= HandleSecondInstanceRequest;
             secondInstanceService.Dispose();
             base.OnClosed(e);
+        }
+
+        private void treeView_NodeExpanded(object sender, TreeViewAdvEventArgs e)
+        {
+            if (e.Node.Tag is OpenHardwareMonitor.GUI.Node hardware)
+            {
+                hardware.IsExpanded = e.Node.IsExpanded;
+            }
+        }
+
+        private void treeview_NodeCollapsed(object sender, TreeViewAdvEventArgs e)
+        {
+            if (e.Node.Tag is OpenHardwareMonitor.GUI.Node hardware)
+            {
+                hardware.IsExpanded = e.Node.IsExpanded;
+            }
         }
     }
 }

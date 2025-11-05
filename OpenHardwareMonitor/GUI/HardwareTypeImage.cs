@@ -32,22 +32,22 @@ namespace OpenHardwareMonitor.GUI {
         return image;
       } else {
         switch (hardwareType) {
-          case HardwareType.CPU:
+          case HardwareType.Cpu:
             image = Utilities.EmbeddedResources.GetImage("cpu.png");
             break;
           case HardwareType.GpuNvidia:
             image = Utilities.EmbeddedResources.GetImage("nvidia.png");
             break;
-          case HardwareType.GpuAti:
-            image = Utilities.EmbeddedResources.GetImage("ati.png");
+          case HardwareType.GpuAmd:
+            image = Utilities.EmbeddedResources.GetImage("amd.png");
             break;
-          case HardwareType.HDD:
+          case HardwareType.Storage:
             image = Utilities.EmbeddedResources.GetImage("hdd.png");
             break;
           case HardwareType.Heatmaster:
             image = Utilities.EmbeddedResources.GetImage("bigng.png");
             break;
-          case HardwareType.Mainboard:
+          case HardwareType.Motherboard:
             image = Utilities.EmbeddedResources.GetImage("mainboard.png");
             break;
           case HardwareType.SuperIO:
@@ -62,6 +62,9 @@ namespace OpenHardwareMonitor.GUI {
           case HardwareType.Network:
             image = Utilities.EmbeddedResources.GetImage("network.png");
             break;
+          case HardwareType.GpuIntel:
+              image = Utilities.EmbeddedResources.GetImage("intel.png");
+              break;
           default:
             image = new Bitmap(1, 1);
             break;
