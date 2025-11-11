@@ -25,7 +25,8 @@ namespace OpenHardwareMonitor.Hardware;
 
 public class Computer : IComputer
 {
-    private readonly List<IGroup> groups = new List<IGroup>();
+    private readonly List<IGroup> m_groups = new List<IGroup>();
+    private readonly object m_groupsLock = new object();
     private readonly ISettings settings;
 
     private SMBIOS smbios;
@@ -52,22 +53,28 @@ public class Computer : IComputer
 
     private void Add(IGroup group)
     {
-        if (groups.Contains(group))
-            return;
+        lock (m_groupsLock)
+        {
+            if (m_groups.Contains(group))
+                return;
 
-        groups.Add(group);
+            m_groups.Add(group);
 
-        if (HardwareAdded != null)
-            foreach (IHardware hardware in group.Hardware)
-                HardwareAdded(hardware);
+            if (HardwareAdded != null)
+                foreach (IHardware hardware in group.Hardware)
+                    HardwareAdded(hardware);
+        }
     }
 
     private void Remove(IGroup group)
     {
-        if (!groups.Contains(group))
-            return;
+        lock (m_groupsLock)
+        {
+            if (!m_groups.Contains(group))
+                return;
 
-        groups.Remove(group);
+            m_groups.Remove(group);
+        }
 
         if (HardwareRemoved != null)
         {
@@ -84,16 +91,19 @@ public class Computer : IComputer
 
     private void RemoveType<T>() where T : IGroup
     {
-        List<IGroup> list = new List<IGroup>();
-        foreach (IGroup group in groups)
+        lock (m_groupsLock)
         {
-            if (group is T)
-                list.Add(group);
-        }
+            List<IGroup> list = new List<IGroup>();
+            foreach (IGroup group in m_groups)
+            {
+                if (group is T)
+                    list.Add(group);
+            }
 
-        foreach (IGroup group in list)
-        {
-            Remove(group);
+            foreach (IGroup group in list)
+            {
+                Remove(group);
+            }
         }
     }
 
@@ -298,11 +308,14 @@ public class Computer : IComputer
     {
         get
         {
-            List<IHardware> list = new List<IHardware>();
-            foreach (IGroup group in groups)
+            lock (m_groupsLock)
+            {
+                List<IHardware> list = new List<IHardware>();
+                foreach (IGroup group in m_groups)
                 foreach (IHardware hardware in group.Hardware)
                     list.Add(hardware);
-            return list.ToArray();
+                return list.ToArray();
+            }
         }
     }
 
@@ -411,46 +424,55 @@ public class Computer : IComputer
             NewSection(w);
             w.WriteLine("Sensors");
             w.WriteLine();
-            foreach (IGroup group in groups)
+            lock (m_groupsLock)
             {
-                foreach (IHardware hardware in group.Hardware)
-                    ReportHardwareSensorTree(hardware, w, "");
-            }
-            w.WriteLine();
-
-            NewSection(w);
-            w.WriteLine("Parameters");
-            w.WriteLine();
-            foreach (IGroup group in groups)
-            {
-                foreach (IHardware hardware in group.Hardware)
-                    ReportHardwareParameterTree(hardware, w, "");
-            }
-            w.WriteLine();
-
-            foreach (IGroup group in groups)
-            {
-                string report = group.GetReport();
-                if (!string.IsNullOrEmpty(report))
+                foreach (IGroup group in m_groups)
                 {
-                    NewSection(w);
-                    w.Write(report);
+                    foreach (IHardware hardware in group.Hardware)
+                        ReportHardwareSensorTree(hardware, w, "");
                 }
 
-                var hardwareArray = group.Hardware;
-                foreach (IHardware hardware in hardwareArray)
-                    ReportHardware(hardware, w);
+                w.WriteLine();
 
+                NewSection(w);
+                w.WriteLine("Parameters");
+                w.WriteLine();
+                foreach (IGroup group in m_groups)
+                {
+                    foreach (IHardware hardware in group.Hardware)
+                        ReportHardwareParameterTree(hardware, w, "");
+                }
+
+                w.WriteLine();
+
+                foreach (IGroup group in m_groups)
+                {
+                    string report = group.GetReport();
+                    if (!string.IsNullOrEmpty(report))
+                    {
+                        NewSection(w);
+                        w.Write(report);
+                    }
+
+                    var hardwareArray = group.Hardware;
+                    foreach (IHardware hardware in hardwareArray)
+                        ReportHardware(hardware, w);
+
+                }
             }
+
             return w.ToString();
         }
     }
 
     private List<IntelCpu> GetIntelCpus()
     {
-        // Create a temporary cpu group if one has not been added.
-        IGroup cpuGroup = groups.Find(x => x is CpuGroup) ?? new CpuGroup(settings);
-        return cpuGroup.Hardware.Select(x => x as IntelCpu).ToList();
+        lock (m_groupsLock)
+        {
+            // Create a temporary cpu group if one has not been added.
+            IGroup cpuGroup = m_groups.Find(x => x is CpuGroup) ?? new CpuGroup(settings);
+            return cpuGroup.Hardware.Select(x => x as IntelCpu).ToList();
+        }
     }
 
     public void Close()
@@ -470,10 +492,13 @@ public class Computer : IComputer
 
     private void RemoveGroups()
     {
-        while (groups.Count > 0)
+        lock (m_groupsLock)
         {
-            IGroup group = groups[groups.Count - 1];
-            Remove(group);
+            while (m_groups.Count > 0)
+            {
+                IGroup group = m_groups[m_groups.Count - 1];
+                Remove(group);
+            }
         }
     }
 
@@ -489,9 +514,12 @@ public class Computer : IComputer
 
     public void Traverse(IVisitor visitor)
     {
-        foreach (IGroup group in groups)
+        lock (m_groupsLock)
+        {
+            foreach (IGroup group in m_groups)
             foreach (IHardware hardware in group.Hardware)
                 hardware.Accept(visitor);
+        }
     }
 
     private class Settings : ISettings
