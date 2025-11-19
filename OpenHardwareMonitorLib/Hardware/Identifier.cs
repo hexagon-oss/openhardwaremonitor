@@ -11,38 +11,36 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace OpenHardwareMonitor.Hardware {
   public class Identifier : IComparable<Identifier> {
     private readonly string identifier;
 
-    private const char Separator = '/';
+     private const char Separator = '/';
 
-    private static void CheckIdentifiers(IEnumerable<string> identifiers) {      
-      foreach (string s in identifiers)
-        if (s.Contains(" ") || s.Contains(Separator.ToString()))
-          throw new ArgumentException("Invalid identifier");
+    private string FilterIdentifier(string identifier)
+    {
+        return Regex.Replace(identifier, @"\/|\\| |'|:|;|\*|<|>||", ""); 
     }
 
     public Identifier(params string[] identifiers) {
-      CheckIdentifiers(identifiers);
 
       StringBuilder s = new StringBuilder();
       for (int i = 0; i < identifiers.Length; i++) {
         s.Append(Separator);
-        s.Append(identifiers[i]);
+        s.Append(FilterIdentifier(identifiers[i]));
       }
       this.identifier = s.ToString();
     }
 
-    public Identifier(Identifier identifier, params string[] extensions) {
-      CheckIdentifiers(extensions);
-
+    public Identifier(Identifier identifier, params string[] extensions) 
+    {
       StringBuilder s = new StringBuilder();
-      s.Append(identifier.ToString());
+      s.Append(FilterIdentifier(identifier.ToString()));
       for (int i = 0; i < extensions.Length; i++) {
         s.Append(Separator);
-        s.Append(extensions[i]);
+        s.Append(FilterIdentifier(extensions[i]));
       }
       this.identifier = s.ToString();
     }
@@ -98,6 +96,5 @@ namespace OpenHardwareMonitor.Hardware {
       else 
         return (id1.CompareTo(id2) > 0);
     }  
-
   }
 }
