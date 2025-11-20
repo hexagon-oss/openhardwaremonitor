@@ -37,7 +37,7 @@ namespace OpenHardwareMonitor.Hardware {
     public Identifier(Identifier identifier, params string[] extensions) 
     {
       StringBuilder s = new StringBuilder();
-      s.Append(FilterIdentifier(identifier.ToString()));
+      s.Append(identifier.ToString());
       for (int i = 0; i < extensions.Length; i++) {
         s.Append(Separator);
         s.Append(FilterIdentifier(extensions[i]));
