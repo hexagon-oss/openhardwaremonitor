@@ -105,11 +105,17 @@ namespace OpenHardwareMonitor.Hardware.HDD {
       AddSensor("Data Read", 1, false, SensorType.Data, (health) => UnitsToData(health.DataUnitRead));
       AddSensor("Data Written", 2, false, SensorType.Data, (health) => UnitsToData(health.DataUnitWritten));
       NVMeHealthInfo log = smart.GetHealthInfo();
-      for (int i = 0; i < log.TemperatureSensors.Length; i++) {
-        if (log.TemperatureSensors[i] > short.MinValue) {
-          int idx = 0;
-          AddSensor("Temperature", i + 1, true, SensorType.Temperature, (health) => health.TemperatureSensors[idx]);
-        }
+      if (log != null && log.TemperatureSensors != null)
+      {
+          for (int i = 0; i < log.TemperatureSensors.Length; i++)
+          {
+              if (log.TemperatureSensors[i] > short.MinValue)
+              {
+                  int idx = 0;
+                  AddSensor("Temperature", i + 1, true, SensorType.Temperature,
+                      (health) => health.TemperatureSensors[idx]);
+              }
+          }
       }
 
       int idx1 = 0;
